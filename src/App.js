@@ -3,15 +3,21 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import Nav from './components/Nav';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import Footer from './components/Footer';
 import Basket from './pages/Basket';
+import Products from './pages/Products';
+import AppAdmin from './admin/AppAdmin';
+import { NotFound } from './admin/NotFound';
+import Dashboard from './admin/Dashboard';
+import { MainNotFound } from './pages/MainNotFound';
 
 function App() {
 
   const [name, setName] = useState();
-
+  const location = useLocation();
+  const origin = location.pathname.split("/")[1];
   useEffect(() => {
     (
       async () => {
@@ -31,17 +37,27 @@ function App() {
   return (
     <div className="App font-poppins">
 
-      <BrowserRouter>
-        <Nav name={name} setName={setName} />
-        <Routes>
-          <Route path="/" exact element={<Home name={name} setName={setName} />} />
-          <Route path="/giris" element={<Login setName={setName} />} />
-          <Route path="/kayit" element={<Register />} />
-          <Route path="/sepet" element={<Basket />} />
-        </Routes>
 
-      </BrowserRouter>
-      <Footer/>
+      {origin !== 'admin' ? <Nav name={name} setName={setName} /> : null}
+      <Routes>
+        <Route path="/" exact element={<Home name={name} setName={setName} />} />
+        <Route path="/giris" element={<Login setName={setName} />} />
+        <Route path="/kayit" element={<Register />} />
+        <Route path="/sepet" element={<Basket />} />
+        <Route path="/kategori/*" element={<Products />} />
+        <Route path="*" element={<MainNotFound />} />
+
+        <Route path="/admin" element={<AppAdmin />}>
+          <Route index element={<Dashboard />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+        {/* <Route path="/products" element={<ProductListing />} /> */}
+        {/* <Route path="/product/:productId" element={<ProductDetails />} /> */}
+      </Routes>
+      {origin !== 'admin' ? <Footer /> : null}
+
+
+
     </div>
   );
 }

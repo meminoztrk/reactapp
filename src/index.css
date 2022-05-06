@@ -4,7 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
-
+html, body {
+	height: 100%;
+  /* zoom: 95%; */
+  background-color: #EBEBEB;
+}
 
 .slick-dots {
   bottom: 20px !important;
@@ -57,4 +61,8 @@
   margin-right: auto;
   opacity: 0.9;
   position: absolute;
+}
+
+.catEl:active, .catEl:focus{
+  font-size: 30px;
 }

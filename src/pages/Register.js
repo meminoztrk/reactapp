@@ -197,7 +197,7 @@ function Register() {
                     <p className='text-2xl font-semibold text-center'>Merhaba,</p>
                     <p className='text-center'>Siteye üye ol ve indirimleri kaçırma!</p>
                 </div>
-                <form onSubmit={submit} id="signform" className="bg-white shadow-xl rounded px-8 pt-6 pb-8 mb-4 text-sm" noValidate>
+                <form onSubmit={submit} id="signform" className="bg-white shadow-xl rounded px-8 pt-2 pb-8 mb-4 text-sm" noValidate>
                     <span className='text-xs text-red-500 text-center block py-3'>{validMessage}</span>
                     <div className="mb-4 relative">
                         <AiOutlineUser className="pointer-events-none w-5 h-5 absolute top-3 transform left-3 text-gray-400" />

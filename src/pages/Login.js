@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { AiFillMail } from 'react-icons/ai';
 import { BsKeyFill } from 'react-icons/bs';
 import usePasswordToggle from './../hooks/usePasswordToggle';
+import { useSelector } from 'react-redux';
 
 
 const Login = (props) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [passwordInputType, inputIcon] = usePasswordToggle();
-
+    const products = useSelector((state) => state.products);
+    console.log(products)
     let navigate = useNavigate();
 
     const submit = async (e) => {
