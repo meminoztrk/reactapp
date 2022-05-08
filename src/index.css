@@ -7,7 +7,7 @@
 html, body {
 	height: 100%;
   /* zoom: 95%; */
-  background-color: #EBEBEB;
+  background-color: #EBEBEB !important;
 }
 
 .slick-dots {
@@ -65,4 +65,20 @@ html, body {
 
 .catEl:active, .catEl:focus{
   font-size: 30px;
+}
+
+.ant-layout-sider-children .img{
+  margin: 16px;
+  padding: 5px;;
+  background-color: white;
+  opacity: 0.7;
+}
+.ant-layout-sider-children .img .logo {
+  height: 32px;
+  background: url("https://images.static-thomann.de/pics//images/logos/thomann-cyan-black.svg") no-repeat scroll right center white;
+  
+}
+
+.site-layout .site-layout-background {
+  background: #fff;
 }

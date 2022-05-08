@@ -12,6 +12,7 @@ import AppAdmin from './admin/AppAdmin';
 import { NotFound } from './admin/NotFound';
 import Dashboard from './admin/Dashboard';
 import { MainNotFound } from './pages/MainNotFound';
+import Categories from './admin/Categories';
 
 function App() {
 
@@ -35,7 +36,7 @@ function App() {
   })
 
   return (
-    <div className="App font-poppins">
+    <div className="font-poppins">
 
 
       {origin !== 'admin' ? <Nav name={name} setName={setName} /> : null}
@@ -49,6 +50,7 @@ function App() {
 
         <Route path="/admin" element={<AppAdmin />}>
           <Route index element={<Dashboard />} />
+          <Route path="/admin/kategoriler" element={<Categories />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         {/* <Route path="/products" element={<ProductListing />} /> */}
