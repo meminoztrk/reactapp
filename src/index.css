@@ -41,12 +41,12 @@ html, body {
   transition: width .2s;
 }
 
-.active {
+.activeNav {
   color: #fb923c;
 
 }
 
-.active::after{
+.activeNav::after{
   content: '';
   display: block;
   width: 95%;
@@ -81,4 +81,20 @@ html, body {
 
 .site-layout .site-layout-background {
   background: #fff;
+}
+
+.ant-switch {
+  background-color:#B9B9B9;
+}
+
+.ant-switch-checked {
+  background: #1890ff;
+}
+
+.ant-btn-primary {
+  color: #fff;
+  border-color: #1890ff;
+  background: #1890ff;
+  text-shadow: 0 -1px 0 rgb(0 0 0 / 12%);
+  box-shadow: 0 2px 0 rgb(0 0 0 / 5%);
 }

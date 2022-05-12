@@ -26,7 +26,7 @@ const Nav = (props) => {
         dispatch(setMenuVisibility({display:"block",actState:index}))
     }
     const toggleActiveStyles = (index) => {
-        if (isHidden.actState === index) { return "active pointer-events-none " } else { return "" }
+        if (isHidden.actState === index) { return "activeNav pointer-events-none " } else { return "" }
     }
 
     let menu;

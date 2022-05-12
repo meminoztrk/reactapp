@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Layout, Menu, Breadcrumb } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
     BuildOutlined,
     PieChartOutlined,
@@ -20,9 +20,11 @@ function getItem(label, key, icon, children) {
     };
 }
 
+
+
 const items = [
-    getItem(<Link to="/admin">Gösterge Paneli</Link>, '1', <PieChartOutlined />),
-    getItem(<Link to="/admin/kategoriler">Kategoriler</Link>, '2', <BuildOutlined />),
+    getItem(<Link to="/admin">Gösterge Paneli</Link>, 'admin', <PieChartOutlined />),
+    getItem(<Link to="/admin/kategoriler">Kategoriler</Link>, 'kategoriler', <BuildOutlined />),
     getItem('Ürün', 'sub1', <UserOutlined />, [
         getItem('Tom', '3'),
         getItem('Bill', '4'),
@@ -34,6 +36,9 @@ const items = [
 
 const AdminNav = () => {
     const [collapse, setCollapse] = useState(false)
+    const location = useLocation();
+    const origin = location.pathname.split("/").pop();
+
     return (
         <div>
             <Layout style={{ minHeight: '100vh' }}>
@@ -42,7 +47,7 @@ const AdminNav = () => {
                         <div className="logo" />
                     </div>
 
-                    <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+                    <Menu theme="dark" selectedKeys={[origin]} mode="inline" items={items} />
                 </Sider>
                 <Layout className="site-layout">
                     <Header className="site-layout-background" style={{ padding: 0 }} />
@@ -52,7 +57,6 @@ const AdminNav = () => {
                             <Breadcrumb.Item>Gösterge Paneli</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-                            Admin Panel
                             <Outlet />
                         </div>
                     </Content>

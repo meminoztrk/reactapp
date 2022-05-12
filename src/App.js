@@ -33,7 +33,7 @@ function App() {
         console.log("app js tarafında name " + content.username)
       }
     )();
-  })
+  },[])
 
   return (
     <div className="font-poppins">
