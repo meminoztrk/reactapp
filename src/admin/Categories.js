@@ -9,7 +9,6 @@ import { MdOutlineError } from 'react-icons/md';
 
 
 
-
 function compareByAlph(a, b) {
   if (a > b) {
     return -1;
@@ -24,16 +23,22 @@ const Categories = () => {
   const [table, setTable] = useState({ data: [], loading: false })
   const [search, setSearch] = useState({ searchText: '', searchedColumn: '' })
   const [deleteForm, setDeleteForm] = useState({ visible: false, deleteId: 0 })
+  const [ispost, setIsPost] = useState(true)
   const [subId, setSubId] = useState(0)
+  const [editId, setEditId] = useState(0)
 
+  //#region API 
   const getCategory = async (id) => {
+    form.resetFields();
+    setIsPost(false)
     await fetch("https://localhost:7168/api/Categories/" + id)
       .then(res => res.json())
       .then(data => {
-        console.log(data.data)
+        setEditId(data.data.id)
+        form.setFieldsValue({ name: data.data.name, active: data.data.isActive })
+        show();
       });
   }
-
   const getCategories = async () => {
     setTable({ loading: true });
     setTimeout(() => {
@@ -60,48 +65,37 @@ const Categories = () => {
         });
     }, 200);
   }
-
   const setActive = async (id, isActive) => {
-    await fetch('https://localhost:7168/api/Categories/UpdateIsActive/', {
-      method: 'PUT',
+    await fetch(`https://localhost:7168/api/Categories/${id}`, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ id: id, isActive: isActive })
-    })
-      .then(response => {
-        if (response.ok) {
-          console.log("okey abi sıkıntı yok", response);
-        }
-      })
-      .catch(function (err) {
-        console.info(err);
-      });
+      body: JSON.stringify([{ path: "isActive", value: isActive }])
+    }).catch(function (err) {
+      console.info(err);
+    });
+    console.log(JSON.stringify({ path: "isActive", value: isActive }))
   }
-
   const setDeleted = async (id) => {
-    await fetch('https://localhost:7168/api/Categories/UpdateIsDeleted/', {
-      method: 'PUT',
+    await fetch(`https://localhost:7168/api/Categories/${id}`, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ id: id, isDeleted: true })
+      body: JSON.stringify([{ path: "isDeleted", value: true }])
     })
       .then(response => {
         if (response.ok) {
-          console.log("okey abi sıkıntı yok", response);
           setDeleteForm({ visible: false })
-          getCategories();
-
+          subId === 0 ? getCategories() : getSubCategories(subId);
         }
       })
       .catch(function (err) {
         console.info(err);
       });
   }
-
-
-  const postCategories = async (name, status, sub) => {
+  const postCategory = async (name, status, sub) => {
     await fetch('https://localhost:7168/api/Categories/', {
       method: 'POST',
       headers: {
@@ -118,12 +112,28 @@ const Categories = () => {
         console.info(err);
       });
   }
+  const editCategory = async (name, status) => {
+    await fetch(`https://localhost:7168/api/Categories/${editId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify([{ path: "name", value: name }, { path: "isActive", value: status }])
+    })
+      .then(response => {
+        if (response.ok) {
+          subId === 0 ? getCategories() : getSubCategories(subId);
+        }
+      })
+      .catch(function (err) {
+        console.info(err);
+      });
+  }
+  //#endregion
 
   useEffect(() => {
     getCategories()
   }, [])
-
-
 
   //#region Table Search
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -272,7 +282,8 @@ const Categories = () => {
     autoSubmitClose: true,
     autoResetForm: true,
     async submit({ name, active }) {
-      postCategories(name, active, subId)
+      ispost ? postCategory(name, active, subId) : editCategory(name, active);
+
       return 'ok';
     },
     form,
@@ -280,8 +291,8 @@ const Categories = () => {
 
   return (
     <div>
-      <button className='bg-blue-500 mb-4 rounded-md hover:bg-blue-700 text-white p-2' onClick={() => { show(); form.resetFields() }} type='primary'><AiOutlinePlus size={20} /></button>
-      <Modal {...modalProps} className='font-poppins' cancelText="İptal" okText="Kaydet" title="Kategori Form" centered >
+      <button className='bg-blue-500 mb-4 rounded-md hover:bg-blue-700 text-white p-2' onClick={() => { show(); form.resetFields(); setIsPost(true); }} type='primary'><AiOutlinePlus size={20} /></button>
+      <Modal {...modalProps} forceRender className='font-poppins' cancelText="İptal" okText="Kaydet" title="Kategori Form" centered >
         <Spin spinning={formLoading}>
           <Form
             {...formProps}
@@ -297,9 +308,7 @@ const Categories = () => {
             >
               <Input />
             </Form.Item>
-
-            <Form.Item name="active" label="Durum"
-              valuePropName="checked" initialValue>
+            <Form.Item name="active" label="Durum" valuePropName='checked' initialValue>
               <Switch
                 checkedChildren="Aktif"
                 unCheckedChildren="Pasif"
@@ -327,10 +336,14 @@ const Categories = () => {
       </Modal>
 
       <Table
+        locale={{
+          emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"Veri Bulunamadı"} />,
+          triggerDesc: 'Z-A ye Sıralama',
+          triggerAsc: 'A-Z ye Sıralama',
+          cancelSort: 'Standart Sıralama'
+        }}
         rowKey="id"
         columns={columns}
-        locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"Veri Bulunamadı"} /> }}
-        // rowKey={record => record.login.uuid}
         dataSource={table.data}
         loading={table.loading}
       />
