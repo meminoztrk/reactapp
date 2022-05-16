@@ -27,22 +27,33 @@ const Categories = () => {
   const [subId, setSubId] = useState(0)
   const [editId, setEditId] = useState(0)
 
+
   //#region API 
   const getCategory = async (id) => {
     form.resetFields();
     setIsPost(false)
-    await fetch("https://localhost:7168/api/Categories/" + id)
+    await fetch(process.env.REACT_APP_API+"/Categories/" + id,{
+      method: 'GET',
+      headers: {
+        'ApiKey':process.env.REACT_APP_API_KEY,
+        'Content-Type': 'application/json'
+      }})
       .then(res => res.json())
       .then(data => {
         setEditId(data.data.id)
         form.setFieldsValue({ name: data.data.name, active: data.data.isActive })
         show();
-      });
+      })
   }
   const getCategories = async () => {
     setTable({ loading: true });
     setTimeout(() => {
-      fetch("https://localhost:7168/api/Categories/GetCategories")
+      fetch(process.env.REACT_APP_API+"/Categories/GetCategories",{
+        method: 'GET',
+        headers: {
+          'ApiKey':process.env.REACT_APP_API_KEY,
+          'Content-Type': 'application/json'
+        }})
         .then(res => res.json())
         .then(data => {
           setTable({
@@ -55,7 +66,12 @@ const Categories = () => {
   const getSubCategories = async (id) => {
     setTable({ loading: true });
     setTimeout(() => {
-      fetch("https://localhost:7168/api/Categories/GetSubCategoriesWithId?id=" + id)
+      fetch(process.env.REACT_APP_API+"/Categories/GetSubCategoriesWithId?id=" + id,{
+        method: 'GET',
+        headers: {
+          'ApiKey':process.env.REACT_APP_API_KEY,
+          'Content-Type': 'application/json'
+        }})
         .then(res => res.json())
         .then(data => {
           setTable({
@@ -66,21 +82,22 @@ const Categories = () => {
     }, 200);
   }
   const setActive = async (id, isActive) => {
-    await fetch(`https://localhost:7168/api/Categories/${id}`, {
+    await fetch(process.env.REACT_APP_API+`/Categories/${id}`, {
       method: 'PATCH',
       headers: {
+        'ApiKey':process.env.REACT_APP_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify([{ path: "isActive", value: isActive }])
     }).catch(function (err) {
       console.info(err);
     });
-    console.log(JSON.stringify({ path: "isActive", value: isActive }))
   }
   const setDeleted = async (id) => {
-    await fetch(`https://localhost:7168/api/Categories/${id}`, {
+    await fetch(process.env.REACT_APP_API+`/Categories/${id}`, {
       method: 'PATCH',
       headers: {
+        'ApiKey':process.env.REACT_APP_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify([{ path: "isDeleted", value: true }])
@@ -96,9 +113,10 @@ const Categories = () => {
       });
   }
   const postCategory = async (name, status, sub) => {
-    await fetch('https://localhost:7168/api/Categories/', {
+    await fetch(process.env.REACT_APP_API+'/Categories/', {
       method: 'POST',
       headers: {
+        'ApiKey':process.env.REACT_APP_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ name: name, subId: sub, isActive: status })
@@ -113,9 +131,10 @@ const Categories = () => {
       });
   }
   const editCategory = async (name, status) => {
-    await fetch(`https://localhost:7168/api/Categories/${editId}`, {
+    await fetch(process.env.REACT_APP_API+`/Categories/${editId}`, {
       method: 'PATCH',
       headers: {
+        'ApiKey':process.env.REACT_APP_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify([{ path: "name", value: name }, { path: "isActive", value: status }])
