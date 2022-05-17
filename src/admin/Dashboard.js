@@ -1,9 +1,20 @@
-import React, { Component } from 'react'
+import React, { useEffect } from 'react'
+import { setNavigation } from '../stores/admin/navigation'
+import { useDispatch } from 'react-redux';
 
-export default class Dashboard extends Component {
-  render() {
-    return (
-      <div>Dashboard</div>
-    )
-  }
+const Dashboard = () => {
+
+  const dispatch = useDispatch();
+    useEffect(() => {
+      dispatch(setNavigation("Gösterge Paneli"))
+    }, []);
+
+
+  return (
+    <div>Dashboard</div>
+  )
 }
+
+export default Dashboard;
+
+

@@ -18,8 +18,8 @@ const Home = (props) => {
         <div>
             
             <div className='container mx-auto px-3 pb-40'>
-                <div className='cursor-pointer pt-10 z-20'>
-                    <Slider {...settings}>
+                <div className='pt-10 z-20'>
+                    <Slider className='cursor-pointer' {...settings}>
                         <div><img className='w-full' src='https://cdns.gamermarkt.com/files/images/index/epic_games_banner_tr.png' alt='banner1' /></div>
                         <div><img className='w-full' src='https://cdns.gamermarkt.com/files/images/index/epic_games_banner_tr.png' alt='banner1' /></div>
                     </Slider>

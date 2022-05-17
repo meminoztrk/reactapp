@@ -1,11 +1,14 @@
 import React from 'react'
-import { Button, Input, Table, Space, Modal, Form, Switch, Spin, Tag, Empty } from "antd";
+import { Button, Input, Table, Space, Modal, Form, Switch, Spin, Tag, Empty, Breadcrumb } from "antd";
 import { useModalForm } from 'sunflower-antd';
 import Highlighter from 'react-highlight-words';
 import { useState, useEffect } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { AiOutlinePlus, AiFillEdit, AiOutlineBars, AiOutlineDelete } from 'react-icons/ai';
 import { MdOutlineError } from 'react-icons/md';
+import { useDispatch } from 'react-redux';
+import { setNavigation } from '../stores/admin/navigation';
+
 
 
 
@@ -26,18 +29,21 @@ const Categories = () => {
   const [ispost, setIsPost] = useState(true)
   const [subId, setSubId] = useState(0)
   const [editId, setEditId] = useState(0)
+  const [catNav, setCatNav] = useState()
+  const dispatch = useDispatch();
 
 
   //#region API 
   const getCategory = async (id) => {
     form.resetFields();
     setIsPost(false)
-    await fetch(process.env.REACT_APP_API+"/Categories/" + id,{
+    await fetch(process.env.REACT_APP_API + "/Categories/" + id, {
       method: 'GET',
       headers: {
-        'ApiKey':process.env.REACT_APP_API_KEY,
+        'ApiKey': process.env.REACT_APP_API_KEY,
         'Content-Type': 'application/json'
-      }})
+      }
+    })
       .then(res => res.json())
       .then(data => {
         setEditId(data.data.id)
@@ -48,44 +54,67 @@ const Categories = () => {
   const getCategories = async () => {
     setTable({ loading: true });
     setTimeout(() => {
-      fetch(process.env.REACT_APP_API+"/Categories/GetCategories",{
+      fetch(process.env.REACT_APP_API + "/Categories/GetCategories", {
         method: 'GET',
         headers: {
-          'ApiKey':process.env.REACT_APP_API_KEY,
+          'ApiKey': process.env.REACT_APP_API_KEY,
           'Content-Type': 'application/json'
-        }})
+        }
+      })
         .then(res => res.json())
         .then(data => {
           setTable({
             loading: false,
             data: data.data,
           });
+          setCatNav(null)
         });
     }, 200);
   }
   const getSubCategories = async (id) => {
     setTable({ loading: true });
     setTimeout(() => {
-      fetch(process.env.REACT_APP_API+"/Categories/GetSubCategoriesWithId?id=" + id,{
+      fetch(process.env.REACT_APP_API + "/Categories/GetSubCategoriesWithId?id=" + id, {
         method: 'GET',
         headers: {
-          'ApiKey':process.env.REACT_APP_API_KEY,
+          'ApiKey': process.env.REACT_APP_API_KEY,
           'Content-Type': 'application/json'
-        }})
+        }
+      })
         .then(res => res.json())
         .then(data => {
           setTable({
             loading: false,
             data: data.data,
           });
+          getNavCategories(id)
         });
     }, 200);
   }
+  const getNavCategories = async (id) => {
+    await fetch(process.env.REACT_APP_API + "/Categories/GetNavCategories?id=" + id, {
+      method: 'GET',
+      headers: {
+        'ApiKey': process.env.REACT_APP_API_KEY,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+        setCatNav(data.data.map((nav, index) =>
+          index !== data.data.length - 1 ? 
+          <Breadcrumb.Item key={index}><a href="#0" onClick={() => getSubCategories(nav.id)}>{nav.name}</a></Breadcrumb.Item> : 
+          <Breadcrumb.Item key={index}>{nav.name}</Breadcrumb.Item>
+          
+        ));
+      })
+  }
   const setActive = async (id, isActive) => {
-    await fetch(process.env.REACT_APP_API+`/Categories/${id}`, {
+    await fetch(process.env.REACT_APP_API + `/Categories/${id}`, {
       method: 'PATCH',
       headers: {
-        'ApiKey':process.env.REACT_APP_API_KEY,
+        'ApiKey': process.env.REACT_APP_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify([{ path: "isActive", value: isActive }])
@@ -94,10 +123,10 @@ const Categories = () => {
     });
   }
   const setDeleted = async (id) => {
-    await fetch(process.env.REACT_APP_API+`/Categories/${id}`, {
+    await fetch(process.env.REACT_APP_API + `/Categories/${id}`, {
       method: 'PATCH',
       headers: {
-        'ApiKey':process.env.REACT_APP_API_KEY,
+        'ApiKey': process.env.REACT_APP_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify([{ path: "isDeleted", value: true }])
@@ -113,10 +142,10 @@ const Categories = () => {
       });
   }
   const postCategory = async (name, status, sub) => {
-    await fetch(process.env.REACT_APP_API+'/Categories/', {
+    await fetch(process.env.REACT_APP_API + '/Categories/', {
       method: 'POST',
       headers: {
-        'ApiKey':process.env.REACT_APP_API_KEY,
+        'ApiKey': process.env.REACT_APP_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ name: name, subId: sub, isActive: status })
@@ -131,10 +160,10 @@ const Categories = () => {
       });
   }
   const editCategory = async (name, status) => {
-    await fetch(process.env.REACT_APP_API+`/Categories/${editId}`, {
+    await fetch(process.env.REACT_APP_API + `/Categories/${editId}`, {
       method: 'PATCH',
       headers: {
-        'ApiKey':process.env.REACT_APP_API_KEY,
+        'ApiKey': process.env.REACT_APP_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify([{ path: "name", value: name }, { path: "isActive", value: status }])
@@ -149,6 +178,10 @@ const Categories = () => {
       });
   }
   //#endregion
+
+  useEffect(() => {
+    dispatch(setNavigation("Kategoriler"))
+  }, [dispatch])
 
   useEffect(() => {
     getCategories()
@@ -310,7 +343,16 @@ const Categories = () => {
 
   return (
     <div>
-      <button className='bg-blue-500 mb-4 rounded-md hover:bg-blue-700 text-white p-2' onClick={() => { show(); form.resetFields(); setIsPost(true); }} type='primary'><AiOutlinePlus size={20} /></button>
+      <div className='flex items-center mb-4 space-x-4'>
+        <button className='bg-blue-500 rounded-md hover:bg-blue-700 text-white p-2' onClick={() => { show(); form.resetFields(); setIsPost(true); }} type='primary'><AiOutlinePlus size={20} /></button>
+        <Breadcrumb>
+          <Breadcrumb.Item>
+            <a href="#0" onClick={() => getCategories()}>Kategoriler</a>
+          </Breadcrumb.Item>
+          {catNav}
+        </Breadcrumb>
+      </div>
+
       <Modal {...modalProps} forceRender className='font-poppins' cancelText="İptal" okText="Kaydet" title="Kategori Form" centered >
         <Spin spinning={formLoading}>
           <Form

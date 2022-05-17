@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom'
 import { Layout, Menu, Breadcrumb } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
@@ -21,23 +22,23 @@ function getItem(label, key, icon, children) {
 }
 
 
-
-const items = [
-    getItem(<Link to="/admin">Gösterge Paneli</Link>, 'admin', <PieChartOutlined />),
-    getItem(<Link to="/admin/kategoriler">Kategoriler</Link>, 'kategoriler', <BuildOutlined />),
-    getItem('Ürün', 'sub1', <UserOutlined />, [
-        getItem('Tom', '3'),
-        getItem('Bill', '4'),
-        getItem('Alex', '5'),
-    ]),
-    getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-    getItem('Files', '9', <FileOutlined />),
-];
-
 const AdminNav = () => {
     const [collapse, setCollapse] = useState(false)
     const location = useLocation();
     const origin = location.pathname.split("/").pop();
+    const navigator = useSelector(state => state.navigation.navigator);
+
+    const items = [
+        getItem(<Link to="/admin">Gösterge Paneli</Link>, 'admin', <PieChartOutlined />),
+        getItem(<Link to="/admin/kategoriler">Kategoriler</Link>, 'kategoriler', <BuildOutlined />),
+        getItem('Ürün', 'sub1', <UserOutlined />, [
+            getItem('Tom', '3'),
+            getItem('Bill', '4'),
+            getItem('Alex', '5'),
+        ]),
+        getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
+        getItem('Files', '9', <FileOutlined />),
+    ];
 
     return (
         <div>
@@ -54,7 +55,7 @@ const AdminNav = () => {
                     <Content style={{ margin: '0 16px' }}>
                         <Breadcrumb style={{ margin: '16px 0' }}>
                             <Breadcrumb.Item>Admin</Breadcrumb.Item>
-                            <Breadcrumb.Item>Gösterge Paneli</Breadcrumb.Item>
+                            <Breadcrumb.Item>{navigator}</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
                             <Outlet />

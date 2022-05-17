@@ -27,7 +27,11 @@ export default category.reducer
 
 export const getMainCategory = () => async dispatch => {
   await axios
-    .get("https://localhost:7168/api/Categories/GetCategoryWithSub")
+    .get(process.env.REACT_APP_API+"/Categories/GetCategoryWithSub",{
+      headers: {
+      'ApiKey':process.env.REACT_APP_API_KEY,
+      'Content-Type': 'application/json'
+    }})
     .then(response => dispatch({ type: getMainCategories.type, payload: response.data.data }))
     .catch((err) => {
       console.log("Err: ", err);
@@ -36,7 +40,11 @@ export const getMainCategory = () => async dispatch => {
 
 export const getSubCategory = () => async dispatch => {
   await axios
-    .get("https://localhost:7168/api/Categories/GetAllMainCategory")
+    .get(process.env.REACT_APP_API+"/Categories/GetAllMainCategory",{
+      headers: {
+      'ApiKey':process.env.REACT_APP_API_KEY,
+      'Content-Type': 'application/json'
+    }})
     .then(response => dispatch({ type: getMainCategories.type, payload: response.data.data }))
     .catch((err) => {
       console.log("Err: ", err);
