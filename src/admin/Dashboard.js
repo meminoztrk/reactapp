@@ -5,9 +5,9 @@ import { useDispatch } from 'react-redux';
 const Dashboard = () => {
 
   const dispatch = useDispatch();
-    useEffect(() => {
-      dispatch(setNavigation("Gösterge Paneli"))
-    }, []);
+  useEffect(() => {
+    dispatch(setNavigation("Gösterge Paneli"))
+  }, [dispatch]);
 
 
   return (

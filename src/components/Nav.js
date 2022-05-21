@@ -122,7 +122,7 @@ const Nav = (props) => {
                     </div>
 
                     <div className=''>
-                        <ul className="flex space-x-8 p-1 pb-4 pr-6 items-center">
+                        <ul className="flex space-x-8 p-1 pr-6 items-center">
                             <li className="text-center flex items-center hover:cursor-pointer">
                                 <p className='text-xs pl-2 font-semibold'>424-00-42</p>
                                 <p className='text-xs text-gray-400 pl-2'>Osmangazi</p>

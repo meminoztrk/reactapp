@@ -9,9 +9,6 @@ import { MdOutlineError } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { setNavigation } from '../stores/admin/navigation';
 
-
-
-
 function compareByAlph(a, b) {
   if (a > b) {
     return -1;

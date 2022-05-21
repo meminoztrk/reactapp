@@ -29,7 +29,7 @@ const NavSubCategories = (props) => {
       <div className="py-10 px-5">
 
         <span className="text-left pl-10 block font-normal text-lg normal-case text-orange-500">
-          <Link key={select.id} to={`/kategori/${UseSeoHelper(select.name)}`} className="hover:underline" onClick={() => setBlock()}>{select.name} Kategorisi</Link>
+          <Link key={select.id} to={`/kategori/${UseSeoHelper(select.name)}`} className="hover:text-orange-500 hover:underline" onClick={() => setBlock()}>{select.name} Kategorisi</Link>
           <i className="fa-solid fa-arrow-right pl-1"></i>
         </span>
 

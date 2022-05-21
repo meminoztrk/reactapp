@@ -13,6 +13,8 @@ import { NotFound } from './admin/NotFound';
 import Dashboard from './admin/Dashboard';
 import { MainNotFound } from './pages/MainNotFound';
 import Categories from './admin/Categories';
+import Brand from './admin/Brand';
+import Orders from './admin/Orders';
 
 function App() {
 
@@ -53,6 +55,8 @@ function App() {
         <Route path="/admin" element={<AppAdmin />}>
           <Route index element={<Dashboard />} />
           <Route path="/admin/kategoriler" element={<Categories />} />
+          <Route path="/admin/markalar" element={<Brand />} />
+          <Route path="/admin/siparisler" element={<Orders />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         {/* <Route path="/products" element={<ProductListing />} /> */}

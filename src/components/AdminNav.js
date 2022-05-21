@@ -5,9 +5,13 @@ import { Layout, Menu, Breadcrumb } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import {
     BuildOutlined,
+    MediumOutlined,
+    AlertOutlined,
     PieChartOutlined,
+    DropboxOutlined,
     FileOutlined,
     TeamOutlined,
+    ArrowLeftOutlined,
     UserOutlined,
 } from '@ant-design/icons';
 const { Header, Content, Footer, Sider } = Layout;
@@ -30,14 +34,23 @@ const AdminNav = () => {
 
     const items = [
         getItem(<Link to="/admin">Gösterge Paneli</Link>, 'admin', <PieChartOutlined />),
-        getItem(<Link to="/admin/kategoriler">Kategoriler</Link>, 'kategoriler', <BuildOutlined />),
-        getItem('Ürün', 'sub1', <UserOutlined />, [
+        getItem('Siparişler', 'siparisler', <AlertOutlined />,[
+            getItem(<Link to="/admin/bekleyen-siparisler">Bekleyen</Link>,'bekleyen'),
+            getItem(<Link to="/admin/tamamlanan-siparisler">Tamamlanan</Link>,'tamamlanan')
+        ]), 
+        getItem('Kategori', 'kategori', <BuildOutlined />, [
+            getItem(<Link to="/admin/kategoriler">Kategoriler</Link>, 'kategoriler'),
+            getItem(<Link to="/admin/kategori-ozellik">Kategori Özellik</Link>, 'kategori-ozellik'),
+        ]),
+        getItem(<Link to="/admin/markalar">Markalar</Link>, 'markalar', <MediumOutlined />),
+        getItem('Ürün', 'sub1', <DropboxOutlined />, [
             getItem('Tom', '3'),
             getItem('Bill', '4'),
             getItem('Alex', '5'),
         ]),
-        getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-        getItem('Files', '9', <FileOutlined />),
+        getItem('Kullanıcılar', 'sub2', <TeamOutlined />),
+        getItem('Raporlar', '9', <FileOutlined />),
+        getItem(<Link to="/">Siteye Dön</Link>, '10', <ArrowLeftOutlined />)
     ];
 
     return (
