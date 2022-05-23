@@ -44,9 +44,8 @@ const AdminNav = () => {
         ]),
         getItem(<Link to="/admin/markalar">Markalar</Link>, 'markalar', <MediumOutlined />),
         getItem('Ürün', 'sub1', <DropboxOutlined />, [
-            getItem('Tom', '3'),
-            getItem('Bill', '4'),
-            getItem('Alex', '5'),
+            getItem(<Link to="/admin/urunler">Ürünler</Link>, 'urunler'),
+            getItem(<Link to="/admin/urun-ekle">Ürün Ekle</Link>, 'urun-ekle'),
         ]),
         getItem('Kullanıcılar', 'sub2', <TeamOutlined />),
         getItem('Raporlar', '9', <FileOutlined />),

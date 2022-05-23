@@ -15,6 +15,9 @@ import { MainNotFound } from './pages/MainNotFound';
 import Categories from './admin/Categories';
 import Brand from './admin/Brand';
 import Orders from './admin/Orders';
+import CatFeature from './admin/CatFeature';
+import ProductAdd from './admin/ProductAdd';
+import AProducts from './admin/Products'
 
 function App() {
 
@@ -55,8 +58,11 @@ function App() {
         <Route path="/admin" element={<AppAdmin />}>
           <Route index element={<Dashboard />} />
           <Route path="/admin/kategoriler" element={<Categories />} />
+          <Route path='/admin/kategori-ozellik' element={<CatFeature/>}/>
           <Route path="/admin/markalar" element={<Brand />} />
           <Route path="/admin/siparisler" element={<Orders />} />
+          <Route path="/admin/urunler" element={<AProducts />} />
+          <Route path="/admin/urun-ekle" element={<ProductAdd />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         {/* <Route path="/products" element={<ProductListing />} /> */}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input, Table, Space, Modal, Form, Switch, Spin, Empty } from "antd";
+import { Button, Input, Select, Table, Space, Modal, Form, Switch, Spin, Empty } from "antd";
 import { useModalForm } from 'sunflower-antd';
 import Highlighter from 'react-highlight-words';
 import { useState, useEffect } from "react";
@@ -11,28 +11,30 @@ import { setNavigation } from '../stores/admin/navigation';
 
 function compareByAlph(a, b) {
     if (a > b) {
-      return -1;
+        return -1;
     }
     if (a < b) {
-      return 1;
+        return 1;
     }
     return 0;
-  }
+}
 
-const Brand = () => {
+const CatFeature = () => {
     const [table, setTable] = useState({ data: [], loading: false })
     const [search, setSearch] = useState({ searchText: '', searchedColumn: '' })
     const [deleteForm, setDeleteForm] = useState({ visible: false, deleteId: 0 })
+    const [categories, setCategories] = useState([])
     const [ispost, setIsPost] = useState(true)
     const [editId, setEditId] = useState(0)
     const dispatch = useDispatch();
+    const { Option } = Select;
 
 
     //#region API 
-    const getBrand = async (id) => {
+    const getFeature = async (id) => {
         form.resetFields();
         setIsPost(false)
-        await fetch(process.env.REACT_APP_API + "/Brands/" + id, {
+        await fetch(process.env.REACT_APP_API + "/Features/" + id, {
             method: 'GET',
             headers: {
                 'ApiKey': process.env.REACT_APP_API_KEY,
@@ -42,14 +44,14 @@ const Brand = () => {
             .then(res => res.json())
             .then(data => {
                 setEditId(data.data.id)
-                form.setFieldsValue({ name: data.data.name, active: data.data.isActive })
+                form.setFieldsValue({ name: data.data.name, active: data.data.isActive, categoryId: data.data.categoryId })
                 show();
             })
     }
-    const getBrands = async () => {
+    const getFeatures = async () => {
         setTable({ loading: true });
         setTimeout(() => {
-            fetch(process.env.REACT_APP_API + "/Brands/GetBrands", {
+            fetch(process.env.REACT_APP_API + "/Features/GetCategoryFeatures", {
                 method: 'GET',
                 headers: {
                     'ApiKey': process.env.REACT_APP_API_KEY,
@@ -66,7 +68,7 @@ const Brand = () => {
         }, 200);
     }
     const setActive = async (id, isActive) => {
-        await fetch(process.env.REACT_APP_API + `/Brands/${id}`, {
+        await fetch(process.env.REACT_APP_API + `/Features/${id}`, {
             method: 'PATCH',
             headers: {
                 'ApiKey': process.env.REACT_APP_API_KEY,
@@ -78,7 +80,7 @@ const Brand = () => {
         });
     }
     const setDeleted = async (id) => {
-        await fetch(process.env.REACT_APP_API + `/Brands/${id}`, {
+        await fetch(process.env.REACT_APP_API + `/Features/${id}`, {
             method: 'PATCH',
             headers: {
                 'ApiKey': process.env.REACT_APP_API_KEY,
@@ -89,56 +91,72 @@ const Brand = () => {
             .then(response => {
                 if (response.ok) {
                     setDeleteForm({ visible: false })
-                    getBrands();
+                    getFeatures();
                 }
             })
             .catch(function (err) {
                 console.info(err);
             });
     }
-    const postBrand = async (name, status) => {
-        await fetch(process.env.REACT_APP_API + '/Brands/', {
+    const postFeature = async (name, status, categoryId) => {
+        await fetch(process.env.REACT_APP_API + '/Features/', {
             method: 'POST',
             headers: {
                 'ApiKey': process.env.REACT_APP_API_KEY,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ name: name, isActive: status })
+            body: JSON.stringify({ name: name, isActive: status, categoryId: categoryId })
         })
             .then(response => {
                 if (response.ok) {
-                    getBrands();
+                    getFeatures();
                 }
             })
             .catch(function (err) {
                 console.info(err);
             });
     }
-    const editBrand = async (name, status) => {
-        await fetch(process.env.REACT_APP_API + `/Brands/${editId}`, {
+    const editFeature = async (name, status, categoryId) => {
+        await fetch(process.env.REACT_APP_API + `/Features/${editId}`, {
             method: 'PATCH',
             headers: {
                 'ApiKey': process.env.REACT_APP_API_KEY,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify([{ path: "name", value: name }, { path: "isActive", value: status }])
+            body: JSON.stringify([{ path: "name", value: name }, { path: "isActive", value: status }, { path: "categoryId", value: categoryId }])
         })
             .then(response => {
                 if (response.ok) {
-                    getBrands();
+                    getFeatures();
                 }
             })
             .catch(function (err) {
                 console.info(err);
             });
     }
+    const getCategories = async () => {
+        setTimeout(() => {
+            fetch(process.env.REACT_APP_API + "/Features/GetLastCategories", {
+                method: 'GET',
+                headers: {
+                    'ApiKey': process.env.REACT_APP_API_KEY,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    setCategories(data.data)
+                });
+        }, 200);
+    }
     //#endregion
 
     useEffect(() => {
-        dispatch(setNavigation("Markalar"))
+        dispatch(setNavigation("Kategori Özellikleri"))
     }, [dispatch]);
     useEffect(() => {
-        getBrands()
+        getFeatures()
+        getCategories()
     }, [])
 
     //#region Table Search
@@ -155,7 +173,7 @@ const Brand = () => {
         setSearch({ searchText: '' });
     };
 
-    const getColumnSearchProps = (dataIndex, placeName) => ({
+    const getColumnSearchProps = (dataIndex, placeName, subName) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
             <div style={{ padding: 8 }}>
                 <Input
@@ -198,10 +216,12 @@ const Brand = () => {
             </div>
         ),
         filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
-        onFilter: (value, record) =>
-            record[dataIndex]
-                ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
-                : '',
+        // onFilter: (value, record) =>
+        //     record[dataIndex]
+        //         ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+        //         : '',
+        onFilter: (value, record) => subName ? record[dataIndex]['name'].toString().toLowerCase().includes(value.toLowerCase()) :
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
         render: text =>
             search.searchedColumn === dataIndex ? (
                 <Highlighter
@@ -218,18 +238,27 @@ const Brand = () => {
 
     const columns = [
         {
-            title: 'Kategoriler',
+            title: 'Özellik',
             dataIndex: 'name',
             key: 'name',
             sorter: (a, b) => compareByAlph(a.name, b.name),
-            width: '20%',
-            ...getColumnSearchProps('name', 'Marka'),
+            width: '30%',
+            ...getColumnSearchProps('name', 'Özellik'),
         },
+        {
+            title: 'Kategori',
+            dataIndex: ['category', 'name'],
+            key: 'category',
+            sorter: (a, b) => compareByAlph(a.category.name, b.category.name),
+            width: '20%',
+            ...getColumnSearchProps('category', 'Kategori', 'name'),
+        },
+
         {
             title: 'Durum',
             dataIndex: 'sub',
             key: 'sub',
-            width: '20%',
+            width: '10%',
             align: 'center',
             render: (text, record) => (
                 <Switch
@@ -246,7 +275,7 @@ const Brand = () => {
             key: 'address',
             render: (text, record) => (
                 <div className='space-x-2'>
-                    <Button className='rounded-md p-2 hover:text-orange-500 hover:border-orange-500' onClick={() => getBrand(record.id)} >
+                    <Button className='rounded-md p-2 hover:text-orange-500 hover:border-orange-500' onClick={() => getFeature(record.id)} >
                         <AiFillEdit />
                     </Button>
                     <Button className='rounded-md p-2 hover:text-red-500 hover:border-red-500' onClick={() => setDeleteForm({ visible: true, deleteId: record.id })} >
@@ -272,13 +301,13 @@ const Brand = () => {
         defaultVisible: false,
         autoSubmitClose: true,
         autoResetForm: true,
-        async submit({ name, active }) {
-            ispost ? postBrand(name, active) : editBrand(name, active);
-
+        async submit({ name, active, categoryId }) {
+            ispost ? postFeature(name, active, categoryId) : editFeature(name, active, categoryId);
             return 'ok';
         },
         form,
     });
+
 
     return (
         <div>
@@ -286,7 +315,7 @@ const Brand = () => {
                 <button className='bg-blue-500 rounded-md hover:bg-blue-700 text-white p-2' onClick={() => { show(); form.resetFields(); setIsPost(true); }} type='primary'><AiOutlinePlus size={20} /></button>
             </div>
 
-            <Modal {...modalProps} forceRender className='font-poppins' cancelText="İptal" okText="Kaydet" title="Marka Form" centered >
+            <Modal {...modalProps} forceRender className='font-poppins' cancelText="İptal" okText="Kaydet" title="Kategori Özellik Form" centered >
                 <Spin spinning={formLoading}>
                     <Form
                         {...formProps}
@@ -296,11 +325,27 @@ const Brand = () => {
                         autoComplete="off"
                     >
                         <Form.Item
-                            label="Marka Adı"
+                            label="Özellik Adı"
                             name="name"
-                            rules={[{ required: true, message: 'Lütfen kategori adı girin!' }]}
+                            rules={[{ required: true, message: 'Lütfen özellik girin!' }]}
                         >
                             <Input />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Kategori"
+                            name="categoryId"
+                            rules={[{ required: true, message: 'Lütfen kategori seçin!' }]}
+                        >
+                            <Select
+                                showSearch
+                                className='w-3/4'
+                                placeholder="Kategori Seçiniz"
+                                optionFilterProp="children"
+                                filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
+                            >
+                                {categories.map(cat => <Option className='font-poppins' key={cat.id} value={cat.id}>{cat.name}</Option>)}
+                            </Select>
                         </Form.Item>
                         <Form.Item name="active" label="Durum" valuePropName='checked' initialValue>
                             <Switch
@@ -345,4 +390,4 @@ const Brand = () => {
     )
 }
 
-export default Brand;
+export default CatFeature

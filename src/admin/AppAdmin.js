@@ -4,8 +4,7 @@ import AdminNav from '../components/AdminNav';
 function AppAdmin() {
     return (
         <div>
-            <AdminNav/>
-            
+            <AdminNav/>     
         </div>
     )
 }
