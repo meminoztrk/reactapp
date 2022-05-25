@@ -5,15 +5,9 @@ import {
     Form,
     Modal,
     Input,
-    InputNumber,
     Cascader,
     Select,
-    Row,
-    Col,
-    Checkbox,
-    Button,
-    AutoComplete,
-    message, Upload
+    Upload
 } from 'antd';
 import { PlusOutlined, LoadingOutlined } from '@ant-design/icons';
 
@@ -33,67 +27,51 @@ const ProductAdd = () => {
     const [previewVisible, setPreviewVisible] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [brands, setBrands] = useState([]);
     const dispatch = useDispatch();
+
+    const { Option } = Select;
+
+    //#region API 
+    const getCategories = async () => {
+        fetch(process.env.REACT_APP_API + "/Products/GetCategoryWithChild", {
+            method: 'GET',
+            headers: {
+                'ApiKey': process.env.REACT_APP_API_KEY,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setCategories(data.data)
+            });
+    }
+    const getBrands = async () => {
+        fetch(process.env.REACT_APP_API + "/Brands/GetBrands", {
+            method: 'GET',
+            headers: {
+                'ApiKey': process.env.REACT_APP_API_KEY,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setBrands(data.data)
+            });
+    }
+    //#endregion
 
 
     useEffect(() => {
         dispatch(setNavigation("Ürün Ekle"))
     }, [dispatch])
+    useEffect(() => {
+        getCategories()
+        getBrands()
+    }, [])
 
-    const residences = [
-        {
-            value: 'zhejiang',
-            label: 'Elektronik',
-            children: [
-                {
-                    value: '1',
-                    label: 'Cep Telefonu ve Aksesuar',
-                    children: [
-                        {
-                            value: '3',
-                            label: 'Cep Telefonu',
-                            children: [
-                                {
-                                    value: '3',
-                                    label: 'Cep Telefonu',
-                                },
-                                {
-                                    value: '4',
-                                    label: 'Cep Telefonu Aksesuar',
-                                },
-                            ],
-                        },
-                        {
-                            value: '4',
-                            label: 'Cep Telefonu Aksesuar',
-                        },
-                    ],
-                },
-                {
-                    value: '2',
-                    label: 'Bilgisayar, Tablet',
-                    children: [
-                    ],
-                },
-            ],
-        },
-        {
-            value: 'jiangsu',
-            label: 'Jiangsu',
-            children: [
-                {
-                    value: 'nanjing',
-                    label: 'Nanjing',
-                    children: [
-                        {
-                            value: 'zhonghuamen',
-                            label: 'Zhong Hua Men',
-                        },
-                    ],
-                },
-            ],
-        },
-    ];
+
 
     const dummyRequest = ({ file, onSuccess }) => {
         setTimeout(() => {
@@ -129,30 +107,51 @@ const ProductAdd = () => {
     );
 
     useEffect(() => {
-      console.log(fileList)
+        console.log(fileList)
     }, [fileList])
-    
+
 
     return (
         <div>
             <Form
                 labelCol={{ span: 4 }}
                 wrapperCol={{ span: 20 }}
-                className="space-y-3"
                 autoComplete="off">
+                <Form.Item
+                    label="Marka"
+                    name="brand"
+                    rules={[{ required: true, message: 'Lütfen marka seçin!' }]}
+                >
+                    <Select
+                        showSearch
+                        className='w-40'
+                        placeholder="Marka seçiniz"
+                        optionFilterProp="children"
+                        filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
+                    >
+                        {brands.map(cat => <Option className='font-poppins' key={cat.id} value={cat.id}>{cat.name}</Option>)}
+                    </Select>
+                </Form.Item>
+                <Form.Item
+                            label="Ürün Adı"
+                            name="name"
+                            rules={[{ required: true, message: 'Lütfen ürün adı girin!' }]}
+                        >
+                            <Input placeholder='Ürün adı girin' />
+                        </Form.Item>
                 <Form.Item
                     name="residence"
                     label="Kategori"
                     rules={[
-                        { type: 'array', required: true, message: 'Please select your habitual residence!' },
+                        { type: 'array', required: true, message: 'Lütfen kategori seçin!' },
                     ]}>
 
-                    <Cascader className='font-poppins' options={residences} placeholder='Lütfen Kategori Seçiniz' />
+                    <Cascader className='font-poppins' onChange={(e)=>console.log(e.slice(-1))} options={categories} placeholder='Kategori seçiniz' />
 
                 </Form.Item>
                 <Form.Item
                     name="upload"
-                    label="Upload"
+                    label="Resimler"
                     valuePropName="file">
 
                     <Upload
