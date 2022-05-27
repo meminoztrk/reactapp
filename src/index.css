@@ -103,3 +103,7 @@ html, body {
   height: 100%;
   font-family: "Poppins"
 }
+
+.ck-editor__editable_inline {
+  min-height: 300px;
+}
