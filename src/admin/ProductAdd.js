@@ -3,10 +3,13 @@ import { setNavigation } from '../stores/admin/navigation';
 import { useDispatch } from 'react-redux';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { useForm } from 'sunflower-antd';
+import { post } from 'axios';
 import {
     Form,
     InputNumber,
     Modal,
+    Spin,
     Input,
     Cascader,
     Select,
@@ -33,6 +36,8 @@ const ProductAdd = () => {
     const [previewTitle, setPreviewTitle] = useState('');
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
+    const [categoryFeatures, setCategoryFeatures] = useState([]);
+    const [catFeatures, setCatFeatures] = useState([]);
     const [inputList, setInputList] = useState([{ color: null, status: null, stock: null, fePrice: null }])
     const dispatch = useDispatch();
     const { Option } = Select;
@@ -71,6 +76,44 @@ const ProductAdd = () => {
                 setBrands(data.data)
             });
     }
+    const getCategoryFeatures = async (id) => {
+        fetch(process.env.REACT_APP_API + "/Products/GetCategoryFeaturesByCategoryId?id=" + id, {
+            method: 'GET',
+            headers: {
+                'ApiKey': process.env.REACT_APP_API_KEY,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setCategoryFeatures(data.data)
+            });
+    }
+    const postProduct = async (product) => {
+        console.log(product)
+        const formData = new FormData();
+        for ( var key in product ) {
+            formData.append(key, product[key]);
+        }
+        for (var i = 0; i < fileList.length; i++) {
+            formData.append('pictures',fileList[i].originFileObj);
+        }
+        for (var x = 0; x < product.categoryFeature.length; x++) {
+            const keyPrefix = "CategoryFeatures[" + x.toString() + "].";
+            formData.append(keyPrefix + "CategoryFeatureId", product.categoryFeature[x].categoryFeatureId);
+            formData.append(keyPrefix + "Value", product.categoryFeature[x].value);
+        }
+        for (var y = 0; y < product.productFeature.length; y++) {
+            const keyPrefix = "ProductFeatures[" + y.toString() + "].";
+            formData.append(keyPrefix + "Status", product.productFeature[y].status);
+            formData.append(keyPrefix + "Color", product.productFeature[y].color);
+            formData.append(keyPrefix + "FePrice", product.productFeature[y].fePrice);
+            formData.append(keyPrefix + "Stock", product.productFeature[y].stock);
+        }
+
+        await post(process.env.REACT_APP_API + '/Products/SaveProduct', formData)
+
+    }
     useEffect(() => {
         getCategories()
         getBrands()
@@ -78,11 +121,6 @@ const ProductAdd = () => {
     //#endregion
 
     //#region Product Images
-    const dummyRequest = ({ file, onSuccess }) => {
-        setTimeout(() => {
-            onSuccess("ok");
-        }, 0);
-    };
 
     useEffect(() => {
         console.log(fileList)
@@ -145,145 +183,189 @@ const ProductAdd = () => {
 
     //#endregion
 
+    //#region Category Feature
+    const handleCatFeatureChange = (value, id) => {
+        let check = catFeatures.find(x => x.categoryFeatureId === id);
+        check ? check.value = value : setCatFeatures([...catFeatures, { categoryFeatureId: id, value: value }])
+    }
+    //#endregion
+
+    const { formProps, formLoading } = useForm({
+        form,
+        async submit({ brand, name, categoryId, explain }) {
+            console.log('submit');
+            await new Promise(r => setTimeout(r, 1000));
+            const product = {
+                brandId: brand,
+                categoryId: categoryId.slice(-1)[0],
+                name: name,
+                explain: explain,
+                pictures: fileList,
+                productFeature:inputList,
+                categoryFeature:catFeatures
+            }
+            postProduct(product)
+            return 'ok';
+        },
+    });
+
     return (
         <div>
-            <Form
-                form={form}
-                labelCol={{ span: 3 }}
-                wrapperCol={{ span: 20 }}
-                autoComplete="off">
-                <Form.Item
-                    label="Marka"
-                    name="brand"
-                    rules={[{ required: true, message: 'Lütfen marka seçin!' }]}
-                >
-                    <Select
-                        showSearch
-                        className='w-48'
-                        placeholder="Marka seçiniz"
-                        optionFilterProp="children"
-                        filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
+            <Spin spinning={formLoading}>
+                <Form
+                    {...formProps}
+                    labelCol={{ span: 3 }}
+                    wrapperCol={{ span: 20 }}
+                    autoComplete="off">
+                    <Form.Item
+                        label="Marka"
+                        name="brand"
+                        rules={[{ required: true, message: 'Lütfen marka seçin!' }]}
                     >
-                        {brands.map(cat => <Option className='font-poppins' key={cat.id} value={cat.id}>{cat.name}</Option>)}
-                    </Select>
-                </Form.Item>
-                <Form.Item
-                    label="Ürün Adı"
-                    name="name"
-                    rules={[{ required: true, message: 'Lütfen ürün adı girin!' }]}
-                >
-                    <Input placeholder='Ürün adı girin' />
-                </Form.Item>
-                {inputList.map((x, i) => {
-                    return (
-                        <Form.Item key={i} label={"Ürün Özelliği " + (i + 1)}>
-                            <Input.Group className='md:space-x-4' compact>
-                                <Form.Item
-                                    name={'status' + (i + 1)}
-                                    noStyle
-                                    rules={[{ required: true, message: 'Lütfen ürün durumu seçin' }]}
-                                >
-                                    <Select className='w-40' value={x.status} onChange={e => handleInputChange(e, 'status', i)} placeholder="Durum seçin">
-                                        <Option value="0">Sıfır</Option>
-                                        <Option value="1">İkinci El</Option>
-                                    </Select>
-                                </Form.Item>
-                                <Form.Item
-                                    name={'color' + (i + 1)}
-                                    noStyle
-                                    rules={[{ required: true, message: 'Lütfen renk girin' }]}
-                                >
-                                    <Input value={x.color} onChange={e => handleInputChange(e.target.value, 'color', i)} className='md:w-40' placeholder="Renk girin" />
-                                </Form.Item>
-                                <Form.Item
-                                    name={'stock' + (i + 1)}
-                                    noStyle
-                                    rules={[{ required: true, message: 'Lütfen stok girin' }]}
-                                >
-                                    <Input value={x.stock} className='md:w-40' onChange={e => handleInputChange(e.target.value, 'stock', i)} placeholder="Stok girin" />
-                                </Form.Item>
-                                <Form.Item
-                                    name={'fePrice' + (i + 1)}
-                                    noStyle
-                                    rules={[{ required: true, message: 'Lütfen ürün fiyatı girin' }]}
-                                >
-                                    <InputNumber
-                                        className='md:w-40'
-                                        placeholder='Fiyat girin'
-                                        value={x.fePrice}
-                                        onChange={e => handleInputChange(e, 'fePrice', i)}
-                                        min={0}
-                                        addonAfter={<span>₺</span>}
-                                        formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                        parser={(value) => value.replace(/\\s?|(,*)/g, '')}
-                                    />
-                                </Form.Item>
-                                {inputList.length !== 1 ? <Form.Item noStyle>
-                                    <div className='pl-10'>
-                                        <Button danger
-                                            className='flex items-center'
-                                            onClick={() => handleRemoveClick(i)}
-                                        >
-                                            <DeleteOutlined /> Özellik Sil
-                                        </Button>
-                                    </div>
-                                </Form.Item> : ""}
-                                {inputList.length === (i + 1) ? <Form.Item noStyle>
-                                    <div className={inputList.length === 1 ? 'pl-10' : ''}>
-                                        <Button
-                                            className='flex items-center'
-                                            onClick={() => handleAddClick()}
-                                        >
-                                            <PlusOutlined /> Özellik Ekle
-                                        </Button>
-                                    </div>
-                                </Form.Item> : ""}
+                        <Select
+                            showSearch
+                            className='w-48'
+                            placeholder="Marka seçiniz"
+                            optionFilterProp="children"
+                            filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
+                        >
+                            {brands.map(cat => <Option className='font-poppins' key={cat.id} value={cat.id}>{cat.name}</Option>)}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item
+                        label="Ürün Adı"
+                        name="name"
+                        rules={[{ required: true, message: 'Lütfen ürün adı girin!' }]}
+                    >
+                        <Input placeholder='Ürün adı girin' />
+                    </Form.Item>
+                    {inputList.map((x, i) => {
+                        return (
+                            <Form.Item key={i} label={"Ürün Özelliği " + (i + 1)}>
+                                <Input.Group className='md:space-x-4' compact>
+                                    <Form.Item
+                                        name={'status' + (i + 1)}
+                                        noStyle
+                                        rules={[{ required: true, message: 'Lütfen ürün durumu seçin' }]}
+                                    >
+                                        <Select className='w-40' value={x.status} onChange={e => handleInputChange(e, 'status', i)} placeholder="Durum seçin">
+                                            <Option value="0">Sıfır</Option>
+                                            <Option value="1">İkinci El</Option>
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item
+                                        name={'color' + (i + 1)}
+                                        noStyle
+                                        rules={[{ required: true, message: 'Lütfen renk girin' }]}
+                                    >
+                                        <Input value={x.color} onChange={e => handleInputChange(e.target.value, 'color', i)} className='md:w-40' placeholder="Renk girin" />
+                                    </Form.Item>
+                                    <Form.Item
+                                        name={'stock' + (i + 1)}
+                                        noStyle
+                                        rules={[{ required: true, message: 'Lütfen stok girin' }]}
+                                    >
+                                        <Input value={x.stock} className='md:w-40' onChange={e => handleInputChange(e.target.value, 'stock', i)} placeholder="Stok girin" />
+                                    </Form.Item>
+                                    <Form.Item
+                                        name={'fePrice' + (i + 1)}
+                                        noStyle
+                                        rules={[{ required: true, message: 'Lütfen ürün fiyatı girin' }]}
+                                    >
+                                        <InputNumber
+                                            className='md:w-40'
+                                            placeholder='Fiyat girin'
+                                            value={x.fePrice}
+                                            onChange={e => handleInputChange(e, 'fePrice', i)}
+                                            min={0}
+                                            addonAfter={<span>₺</span>}
+                                            formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                            parser={(value) => value.replace(/\\s?|(,*)/g, '')}
+                                        />
+                                    </Form.Item>
+                                    {inputList.length !== 1 ? <Form.Item noStyle>
+                                        <div className='pl-10'>
+                                            <Button danger
+                                                className='flex items-center'
+                                                onClick={() => handleRemoveClick(i)}
+                                            >
+                                                <DeleteOutlined /> Özellik Sil
+                                            </Button>
+                                        </div>
+                                    </Form.Item> : ""}
+                                    {inputList.length === (i + 1) ? <Form.Item noStyle>
+                                        <div className={inputList.length === 1 ? 'pl-10' : ''}>
+                                            <Button
+                                                className='flex items-center'
+                                                onClick={() => handleAddClick()}
+                                            >
+                                                <PlusOutlined /> Özellik Ekle
+                                            </Button>
+                                        </div>
+                                    </Form.Item> : ""}
 
-                            </Input.Group>
-                        </Form.Item>
+                                </Input.Group>
+                            </Form.Item>
 
-                    )
-                })}
+                        )
+                    })}
 
-                <Form.Item
-                    name="residence"
-                    label="Kategori"
-                    rules={[
-                        { type: 'array', required: true, message: 'Lütfen kategori seçin!' },
-                    ]}>
+                    <Form.Item
+                        name="categoryId"
+                        label="Kategori"
+                        rules={[
+                            { type: 'array', required: true, message: 'Lütfen kategori seçin!' },
+                        ]}>
 
-                    <Cascader className='font-poppins' onChange={(e) => console.log(e.slice(-1))} options={categories} placeholder='Kategori seçiniz' />
+                        <Cascader className='font-poppins' onChange={(e) => getCategoryFeatures(e.slice(-1)[0])} options={categories} placeholder='Kategori seçiniz' />
 
-                </Form.Item>
-                <Form.Item
-                    name="upload"
-                    label="Resimler"
-                    valuePropName="file">
+                    </Form.Item>
+                    {categoryFeatures.map((x, i) => {
+                        return (
+                            <Form.Item
+                                name={x.name}
+                                label={x.name}
+                                key={i}
+                                rules={[{ required: true, message: `Lütfen ${x.name} girin` }]}
+                            >
+                                <Input onChange={e => handleCatFeatureChange(e.target.value, x.id)} className='md:w-40' placeholder={x.name + " girin"} />
+                            </Form.Item>
+                        )
+                    })}
+                    <Form.Item
+                        name="upload"
+                        label="Resimler"
+                        valuePropName="file">
 
-                    <Upload
-                        name="logo"
-                        customRequest={dummyRequest}
-                        onPreview={handleImagePreview}
-                        onChange={handleImageChange}
-                        accept='image/png, image/jpeg'
-                        listType="picture-card">
-                        {fileList.length >= 6 ? null : uploadButton}
-                    </Upload>
+                        <Upload
+                            name="logo"
+                            beforeUpload={()=>false}
+                            onPreview={handleImagePreview}
+                            onChange={handleImageChange}
+                            fileList={fileList}
+                            accept='image/png, image/jpeg'
+                            listType="picture-card">
+                            {fileList.length >= 6 ? null : uploadButton}
+                        </Upload>
 
-                </Form.Item>
-                <Form.Item label='Ürün Açıklaması'
-                    name='body'
-                    valuePropName='data'
-                    getValueFromEvent={(event, editor) => {
-                        const data = editor.getData();
-                        return data;
-                    }}
-                    rules={[{ required: true, message: 'Lütfen açıklama girin' }]}>
-                    <CKEditor onChange={(event, editor) => { const data = editor.getData(); console.log(data) }} editor={ClassicEditor} />
-                </Form.Item>
-
-            </Form>
-
+                    </Form.Item>
+                    <Form.Item label='Ürün Açıklaması'
+                        name='explain'
+                        valuePropName='data'
+                        getValueFromEvent={(event, editor) => {
+                            const data = editor.getData();
+                            return data;
+                        }}
+                        rules={[{ required: true, message: 'Lütfen açıklama girin' }]}>
+                        <CKEditor editor={ClassicEditor} />
+                    </Form.Item>
+                    <Form.Item wrapperCol={{ offset: 3, span: 20 }}>
+                        <Button type="primary" htmlType="submit">
+                            Kaydet
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Spin>
             <Modal visible={previewVisible} title={previewTitle} footer={null} onCancel={handleCancel}>
                 <img
                     alt="example"
@@ -293,6 +375,7 @@ const ProductAdd = () => {
                     src={previewImage}
                 />
             </Modal>
+
         </div>
     )
 }
