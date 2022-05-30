@@ -112,6 +112,10 @@ const ProductAdd = () => {
         }
 
         await post(process.env.REACT_APP_API + '/Products/SaveProduct', formData)
+            .then(resp=>console.log(resp))
+            .catch(function (error) {
+                console.log(error.toJSON());
+              });
 
     }
     useEffect(() => {
