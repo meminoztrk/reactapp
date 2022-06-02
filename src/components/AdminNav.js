@@ -12,7 +12,7 @@ import {
     FileOutlined,
     TeamOutlined,
     ArrowLeftOutlined,
-    UserOutlined,
+    // UserOutlined,
 } from '@ant-design/icons';
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -48,14 +48,14 @@ const AdminNav = () => {
             getItem(<Link to="/admin/urun-ekle">Ürün Ekle</Link>, 'urun-ekle'),
         ]),
         getItem('Kullanıcılar', 'sub2', <TeamOutlined />),
-        getItem('Raporlar', '9', <FileOutlined />),
-        getItem(<Link to="/">Siteye Dön</Link>, '10', <ArrowLeftOutlined />)
+        getItem('Raporlar', 'aa', <FileOutlined />),
+        getItem(<Link to="/">Siteye Dön</Link>, 'aaa', <ArrowLeftOutlined />)
     ];
 
     return (
         <div>
             <Layout style={{ minHeight: '100vh' }}>
-                <Sider collapsible collapsed={collapse} onCollapse={() => setCollapse(!collapse)}>
+                <Sider collapsible collapsed={collapse}  onCollapse={() => setCollapse(!collapse)}>
                     <div className='img'>
                         <div className="logo" />
                     </div>

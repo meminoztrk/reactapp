@@ -18,6 +18,7 @@ import Orders from './admin/Orders';
 import CatFeature from './admin/CatFeature';
 import ProductAdd from './admin/ProductAdd';
 import AProducts from './admin/Products'
+import ProductEdit from './admin/ProductEdit';
 
 function App() {
 
@@ -62,6 +63,7 @@ function App() {
           <Route path="/admin/markalar" element={<Brand />} />
           <Route path="/admin/siparisler" element={<Orders />} />
           <Route path="/admin/urunler" element={<AProducts />} />
+          <Route path="/admin/urunler/:id" element={<ProductEdit />} />
           <Route path="/admin/urun-ekle" element={<ProductAdd />} />
           <Route path="*" element={<NotFound />} />
         </Route>

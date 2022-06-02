@@ -3,12 +3,14 @@ import { setNavigation } from '../stores/admin/navigation';
 import { useDispatch } from 'react-redux';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { useNavigate } from "react-router-dom";
 import { useForm } from 'sunflower-antd';
 import { post } from 'axios';
 import {
     Form,
     InputNumber,
     Modal,
+    Switch,
     Spin,
     Input,
     Cascader,
@@ -42,6 +44,7 @@ const ProductAdd = () => {
     const dispatch = useDispatch();
     const { Option } = Select;
     const [form] = Form.useForm();
+    let navigate = useNavigate();
 
     //#region Navigation
     useEffect(() => {
@@ -112,7 +115,7 @@ const ProductAdd = () => {
         }
 
         await post(process.env.REACT_APP_API + '/Products/SaveProduct', formData)
-            .then(resp=>console.log(resp))
+            .then(resp=> navigate("/admin/urunler"))
             .catch(function (error) {
                 console.log(error.toJSON());
               });
@@ -196,7 +199,7 @@ const ProductAdd = () => {
 
     const { formProps, formLoading } = useForm({
         form,
-        async submit({ brand, name, categoryId, explain }) {
+        async submit({ brand, name, categoryId, explain, isActive }) {
             console.log('submit');
             await new Promise(r => setTimeout(r, 1000));
             const product = {
@@ -204,6 +207,7 @@ const ProductAdd = () => {
                 categoryId: categoryId.slice(-1)[0],
                 name: name,
                 explain: explain,
+                isActive: isActive,
                 pictures: fileList,
                 productFeature:inputList,
                 categoryFeature:catFeatures
@@ -363,6 +367,12 @@ const ProductAdd = () => {
                         rules={[{ required: true, message: 'Lütfen açıklama girin' }]}>
                         <CKEditor editor={ClassicEditor} />
                     </Form.Item>
+                    <Form.Item name="isActive" label="Durum" valuePropName='checked' initialValue>
+                            <Switch
+                                checkedChildren="Aktif"
+                                unCheckedChildren="Pasif"
+                            />
+                        </Form.Item>
                     <Form.Item wrapperCol={{ offset: 3, span: 20 }}>
                         <Button type="primary" htmlType="submit">
                             Kaydet
