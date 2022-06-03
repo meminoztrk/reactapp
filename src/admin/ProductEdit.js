@@ -29,6 +29,7 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
+  let catCheck = false;
 const ProductEdit = () => {
   const [loading, setLoading] = useState(true);
   const [images, setImages] = useState([]);
@@ -113,39 +114,40 @@ const ProductEdit = () => {
         setCategoryFeatures(data.data)
       });
   }
-  const postProduct = async (product) => {
+  const editProduct = async (product) => {
     console.log(product)
-    const formData = new FormData();
-    for (var key in product) {
-      formData.append(key, product[key]);
-    }
-    for (var i = 0; i < fileList.length; i++) {
-      formData.append('pictures', fileList[i].originFileObj);
-    }
-    for (var x = 0; x < product.categoryFeature.length; x++) {
-      const keyPrefix = "CategoryFeatures[" + x.toString() + "].";
-      formData.append(keyPrefix + "CategoryFeatureId", product.categoryFeature[x].categoryFeatureId);
-      formData.append(keyPrefix + "Value", product.categoryFeature[x].value);
-    }
-    for (var y = 0; y < product.productFeature.length; y++) {
-      const keyPrefix = "ProductFeatures[" + y.toString() + "].";
-      formData.append(keyPrefix + "Status", product.productFeature[y].status);
-      formData.append(keyPrefix + "Color", product.productFeature[y].color);
-      formData.append(keyPrefix + "FePrice", product.productFeature[y].fePrice);
-      formData.append(keyPrefix + "Stock", product.productFeature[y].stock);
-    }
+    // const formData = new FormData();
+    // for (var key in product) {
+    //   formData.append(key, product[key]);
+    // }
+    // for (var i = 0; i < fileList.length; i++) {
+    //   formData.append('pictures', fileList[i].originFileObj);
+    // }
+    // for (var x = 0; x < product.categoryFeature.length; x++) {
+    //   const keyPrefix = "CategoryFeatures[" + x.toString() + "].";
+    //   formData.append(keyPrefix + "CategoryFeatureId", product.categoryFeature[x].categoryFeatureId);
+    //   formData.append(keyPrefix + "Value", product.categoryFeature[x].value);
+    // }
+    // for (var y = 0; y < product.productFeature.length; y++) {
+    //   const keyPrefix = "ProductFeatures[" + y.toString() + "].";
+    //   formData.append(keyPrefix + "Status", product.productFeature[y].status);
+    //   formData.append(keyPrefix + "Color", product.productFeature[y].color);
+    //   formData.append(keyPrefix + "FePrice", product.productFeature[y].fePrice);
+    //   formData.append(keyPrefix + "Stock", product.productFeature[y].stock);
+    // }
 
-    await post(process.env.REACT_APP_API + '/Products/SaveProduct', formData)
-      .then(resp => navigate("/admin/urunler"))
-      .catch(function (error) {
-        console.log(error.toJSON());
-      });
+    // await post(process.env.REACT_APP_API + '/Products/SaveProduct', formData)
+    //   .then(resp => navigate("/admin/urunler"))
+    //   .catch(function (error) {
+    //     console.log(error.toJSON());
+    //   });
 
   }
   useEffect(() => {
     getCategories()
     getBrands()
     getProduct()
+    catCheck = false;
   }, [])
   //#endregion
 
@@ -171,7 +173,7 @@ const ProductEdit = () => {
   }, [fileList])
 
   useEffect(() => {
-    console.log("Resimler",images)
+    console.log("Resimler", images)
   }, [images])
 
 
@@ -208,7 +210,7 @@ const ProductEdit = () => {
   useEffect(() => {
     inputList.map((x, i) =>
       form.setFieldsValue({
-        ['status' + (i + 1)]: x.status === "Sıfır" ? 0 : 1,
+        ['status' + (i + 1)]: x.status === "Sıfır" ? 0 : x.status === "İkinci El" ? 1 : null,
         ['color' + (i + 1)]: x.color,
         ['stock' + (i + 1)]: x.stock,
         ['fePrice' + (i + 1)]: x.fePrice,
@@ -234,8 +236,8 @@ const ProductEdit = () => {
 
   //#region Category Feature
   const handleCatFeatureChange = (value, id) => {
-    let check = catFeatures.find(x => x.categoryFeatureId === id);
-    check ? check.value = value : setCatFeatures([...catFeatures, { categoryFeatureId: id, value: value }])
+    let check = editFeatures.find(x => x.categoryFeatureId === id);
+    check ? check.value = value : setEditFeatures([...editFeatures, { categoryFeatureId: id, value: value }])
   }
   useEffect(() => {
     editFeatures.map((x, i) =>
@@ -244,6 +246,15 @@ const ProductEdit = () => {
       })
     )
   }, [editFeatures])
+
+  function defCatFeatures() {
+      categoryFeatures.map((x, i) =>
+        form.setFieldsValue({
+          [x.name]: null,
+        })
+      )
+      setEditFeatures([])
+  }
 
   //#endregion
 
@@ -258,11 +269,11 @@ const ProductEdit = () => {
         name: name,
         explain: explain,
         isActive: isActive,
-        pictures: fileList,
+        pictures: images,
         productFeature: inputList,
-        categoryFeature: catFeatures
+        categoryFeature: editFeatures
       }
-      postProduct(product)
+      editProduct(product)
       return 'ok';
     },
   });
@@ -374,7 +385,7 @@ const ProductEdit = () => {
               { type: 'array', required: true, message: 'Lütfen kategori seçin!' },
             ]}>
 
-            <Cascader className='font-poppins' onChange={(e) => getCategoryFeatures(e.slice(-1)[0])} options={categories} placeholder='Kategori seçiniz' />
+            <Cascader className='font-poppins' onChange={(e) => { getCategoryFeatures(e.slice(-1)[0]); defCatFeatures() }} options={categories} placeholder='Kategori seçiniz' />
 
           </Form.Item>
           {categoryFeatures.map((x, i) => {
