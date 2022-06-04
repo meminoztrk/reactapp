@@ -3,9 +3,9 @@ import { setNavigation } from '../stores/admin/navigation';
 import { useDispatch } from 'react-redux';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useForm } from 'sunflower-antd';
-import { post } from 'axios';
+import { put } from 'axios';
 import {
   Form,
   InputNumber,
@@ -16,7 +16,9 @@ import {
   Cascader,
   Select,
   Upload,
-  Button
+  Button,
+  BackTop,
+  notification
 } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 
@@ -29,7 +31,6 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
-  let catCheck = false;
 const ProductEdit = () => {
   const [loading, setLoading] = useState(true);
   const [images, setImages] = useState([]);
@@ -40,13 +41,11 @@ const ProductEdit = () => {
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [categoryFeatures, setCategoryFeatures] = useState([]);
-  const [catFeatures, setCatFeatures] = useState([]);
   const [editFeatures, setEditFeatures] = useState([]);
   const [inputList, setInputList] = useState([{ color: null, status: null, stock: null, fePrice: null }])
   const dispatch = useDispatch();
   const { Option } = Select;
   const [form] = Form.useForm();
-  let navigate = useNavigate();
   let { id } = useParams();
 
 
@@ -61,7 +60,6 @@ const ProductEdit = () => {
     })
       .then(res => res.json())
       .then(data => {
-        console.log(data.data);
         dispatch(setNavigation(data.data.name));
         form.setFieldsValue({ name: data.data.name, brand: data.data.brandId, categoryId: data.data.categoryId, explain: data.data.description, isActive: data.data.isActive, })
         getCategoryFeatures(data.data.categoryId.slice(-1)[0]);
@@ -115,40 +113,47 @@ const ProductEdit = () => {
       });
   }
   const editProduct = async (product) => {
-    console.log(product)
-    // const formData = new FormData();
-    // for (var key in product) {
-    //   formData.append(key, product[key]);
-    // }
-    // for (var i = 0; i < fileList.length; i++) {
-    //   formData.append('pictures', fileList[i].originFileObj);
-    // }
-    // for (var x = 0; x < product.categoryFeature.length; x++) {
-    //   const keyPrefix = "CategoryFeatures[" + x.toString() + "].";
-    //   formData.append(keyPrefix + "CategoryFeatureId", product.categoryFeature[x].categoryFeatureId);
-    //   formData.append(keyPrefix + "Value", product.categoryFeature[x].value);
-    // }
-    // for (var y = 0; y < product.productFeature.length; y++) {
-    //   const keyPrefix = "ProductFeatures[" + y.toString() + "].";
-    //   formData.append(keyPrefix + "Status", product.productFeature[y].status);
-    //   formData.append(keyPrefix + "Color", product.productFeature[y].color);
-    //   formData.append(keyPrefix + "FePrice", product.productFeature[y].fePrice);
-    //   formData.append(keyPrefix + "Stock", product.productFeature[y].stock);
-    // }
+    setLoading(true)
+    const formData = new FormData();
+    for (var key in product) {
+      formData.append(key, product[key]);
+    }
+    for (var i = 0; i < images.length; i++) {
+      formData.append('pictures', images[i]);
+    }
+    for (var x = 0; x < product.categoryFeature.length; x++) {
+      const keyPrefix = "CategoryFeatures[" + x.toString() + "].";
+      formData.append(keyPrefix + "CategoryFeatureId", product.categoryFeature[x].categoryFeatureId);
+      formData.append(keyPrefix + "Value", product.categoryFeature[x].value);
+    }
+    for (var y = 0; y < product.productFeature.length; y++) {
+      const keyPrefix = "ProductFeatures[" + y.toString() + "].";
+      formData.append(keyPrefix + "Status", product.productFeature[y].status);
+      formData.append(keyPrefix + "Color", product.productFeature[y].color);
+      formData.append(keyPrefix + "FePrice", product.productFeature[y].fePrice);
+      formData.append(keyPrefix + "Stock", product.productFeature[y].stock);
+    }
 
-    // await post(process.env.REACT_APP_API + '/Products/SaveProduct', formData)
-    //   .then(resp => navigate("/admin/urunler"))
-    //   .catch(function (error) {
-    //     console.log(error.toJSON());
-    //   });
+    await put(process.env.REACT_APP_API + '/Products/EditProduct?id=' + id, formData)
+      .then(resp => { setLoading(false); openNotificationWithIcon('success') })
+      .catch(function (error) {
+        console.log(error.toJSON());
+      });
 
   }
   useEffect(() => {
     getCategories()
     getBrands()
     getProduct()
-    catCheck = false;
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const openNotificationWithIcon = (type) => {
+    notification[type]({
+      message: 'Bildirim',
+      description:
+        'Ürün başarı ile güncellendi',
+    });
+  };
   //#endregion
 
   //#region Product Images
@@ -159,10 +164,15 @@ const ProductEdit = () => {
     async function fetchUrlToImage() {
       const symbols = [];
       for await (let file of fileList) {
-        const response = await fetch("https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png");
-        const blob = await response.blob();
-        const filel = new File([blob], file.name, { type: blob.type });
-        symbols.push(filel);
+        if (file.status === "done") {
+          const response = await fetch("https://localhost:7168/api/Products/GetImage?path=" + file.name);
+          const blob = await response.blob();
+          const filel = new File([blob], file.name, { type: blob.type });
+          symbols.push(filel);
+        }
+        else {
+          symbols.push(file.originFileObj);
+        }
       }
 
       setImages(symbols);
@@ -171,11 +181,6 @@ const ProductEdit = () => {
     fetchUrlToImage();
 
   }, [fileList])
-
-  useEffect(() => {
-    console.log("Resimler", images)
-  }, [images])
-
 
   const handleCancel = () => setPreviewVisible(false);
 
@@ -210,7 +215,7 @@ const ProductEdit = () => {
   useEffect(() => {
     inputList.map((x, i) =>
       form.setFieldsValue({
-        ['status' + (i + 1)]: x.status === "Sıfır" ? 0 : x.status === "İkinci El" ? 1 : null,
+        ['status' + (i + 1)]: x.status,
         ['color' + (i + 1)]: x.color,
         ['stock' + (i + 1)]: x.stock,
         ['fePrice' + (i + 1)]: x.fePrice,
@@ -245,15 +250,15 @@ const ProductEdit = () => {
         [x.name]: x.value,
       })
     )
-  }, [editFeatures])
+  }, [editFeatures]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function defCatFeatures() {
-      categoryFeatures.map((x, i) =>
-        form.setFieldsValue({
-          [x.name]: null,
-        })
-      )
-      setEditFeatures([])
+    categoryFeatures.map((x, i) =>
+      form.setFieldsValue({
+        [x.name]: null,
+      })
+    )
+    setEditFeatures([])
   }
 
   //#endregion
@@ -261,7 +266,6 @@ const ProductEdit = () => {
   const { formProps, formLoading } = useForm({
     form,
     async submit({ brand, name, categoryId, explain, isActive }) {
-      console.log('submit');
       await new Promise(r => setTimeout(r, 1000));
       const product = {
         brandId: brand,
@@ -280,6 +284,7 @@ const ProductEdit = () => {
   return (
     <div>
       <Spin spinning={formLoading || loading}>
+        <BackTop />
         <Form
           {...formProps}
           labelCol={{ span: 3 }}
@@ -317,8 +322,8 @@ const ProductEdit = () => {
                     rules={[{ required: true, message: 'Lütfen ürün durumu seçin' }]}
                   >
                     <Select className='w-40' value={x.status} onChange={e => handleInputChange(e, 'status', i)} placeholder="Durum seçin">
-                      <Option className='font-poppins' value={0}>Sıfır</Option>
-                      <Option className='font-poppins' value={1}>İkinci El</Option>
+                      <Option className='font-poppins' value={false}>Sıfır</Option>
+                      <Option className='font-poppins' value={true}>İkinci El</Option>
                     </Select>
                   </Form.Item>
                   <Form.Item
