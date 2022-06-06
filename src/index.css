@@ -107,3 +107,20 @@ html, body {
 .ck-editor__editable_inline {
   min-height: 300px;
 }
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #fb923c;
+  border-color: #fb923c !important;
+}
+
+.ant-radio-checked .ant-radio-inner{
+  border-color: #fb923c !important ;
+}
+
+.ant-radio-checked .ant-radio-inner:after{
+  background-color: #fb923c;
+}
+
+.ant-radio:hover .ant-radio-inner {
+  border-color: #fb923c ;
+}

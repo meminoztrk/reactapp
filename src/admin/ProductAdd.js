@@ -93,7 +93,6 @@ const ProductAdd = () => {
             });
     }
     const postProduct = async (product) => {
-        console.log(product)
         const formData = new FormData();
         for ( var key in product ) {
             formData.append(key, product[key]);
@@ -106,6 +105,7 @@ const ProductAdd = () => {
             formData.append(keyPrefix + "CategoryFeatureId", product.categoryFeature[x].categoryFeatureId);
             formData.append(keyPrefix + "Value", product.categoryFeature[x].value);
         }
+        console.log(product.productFeature)
         for (var y = 0; y < product.productFeature.length; y++) {
             const keyPrefix = "ProductFeatures[" + y.toString() + "].";
             formData.append(keyPrefix + "Status", product.productFeature[y].status);
@@ -113,7 +113,7 @@ const ProductAdd = () => {
             formData.append(keyPrefix + "FePrice", product.productFeature[y].fePrice);
             formData.append(keyPrefix + "Stock", product.productFeature[y].stock);
         }
-
+        
         await post(process.env.REACT_APP_API + '/Products/SaveProduct', formData)
             .then(resp=> navigate("/admin/urunler"))
             .catch(function (error) {
@@ -257,8 +257,8 @@ const ProductAdd = () => {
                                         rules={[{ required: true, message: 'Lütfen ürün durumu seçin' }]}
                                     >
                                         <Select className='w-40' value={x.status} onChange={e => handleInputChange(e, 'status', i)} placeholder="Durum seçin">
-                                            <Option value="0">Sıfır</Option>
-                                            <Option value="1">İkinci El</Option>
+                                            <Option value="false">Sıfır</Option>
+                                            <Option value="true">İkinci El</Option>
                                         </Select>
                                     </Form.Item>
                                     <Form.Item
