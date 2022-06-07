@@ -124,3 +124,7 @@ html, body {
 .ant-radio:hover .ant-radio-inner {
   border-color: #fb923c ;
 }
+
+.ant-tree-switcher{
+  display: none !important;
+}

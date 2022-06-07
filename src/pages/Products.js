@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import ProductFilter from '../containers/ProductFilter'
 import ProductList from '../containers/ProductList'
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { Breadcrumb } from 'antd';
-
 
 
 const Products = () => {
@@ -11,6 +10,7 @@ const Products = () => {
     const [breadcrumb, setBreadcrumb] = useState([]);
     const [products, setProducts] = useState([]);
     const [productNav, setProductNav] = useState([]);
+    const [features, setFeatures] = useState([]);
 
     const getAllData = async (loc) => {
         await fetch(process.env.REACT_APP_API + "/Products/GetProductsByCategoryName", {
@@ -27,6 +27,7 @@ const Products = () => {
             setBreadcrumb(data.data.navigation);
             setProducts(data.data.products);
             setProductNav(data.data.productNav)
+            setFeatures(data.data.productFeatures);
           })
       }
 
@@ -43,11 +44,11 @@ const Products = () => {
                 <Breadcrumb.Item href="#">Ana Sayfa</Breadcrumb.Item>
                 {breadcrumb.map((item, index) => {
                     return (breadcrumb.length - 1 !== index ? 
-                        <Breadcrumb.Item href='#' key={index}>{item}</Breadcrumb.Item> : <Breadcrumb.Item key={index}>{item}</Breadcrumb.Item>)
+                        <Breadcrumb.Item key={index}><Link to={item.path}>{item.name}</Link></Breadcrumb.Item> : <Breadcrumb.Item key={index}>{item.name}</Breadcrumb.Item>)
                 })}
             </Breadcrumb>
             <div className='flex py-4 justify-between space-x-4 h-full'>
-                <ProductFilter/>
+                <ProductFilter features={features} />
                 <ProductList products={products} nav={productNav} />
             </div>
 

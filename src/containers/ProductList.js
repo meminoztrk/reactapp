@@ -26,7 +26,7 @@ const ProductList = (props) => {
     }, [location.pathname])
 
 
-    const product = (image, name, price, id) => (<div className='xl:w-1/4 lg:w-1/3 w-1/2 p-2 h-[33rem] relative'>
+    const product = (image, name, price, id, brand) => (<div className='xl:w-1/4 lg:w-1/3 w-1/2 p-2 h-[33rem] relative'>
         <div className='group flex flex-col bg-white rounded-md border h-full hover:shadow-lg hover:drop-shadow-xl hover:border-gray-50 cursor-pointer p-2'>
             <div className='h-1/2 flex justify-center'>
                 <div className='p-2'>
@@ -35,6 +35,7 @@ const ProductList = (props) => {
             </div>
             <div className='h-1/2 flex flex-col relative'>
                 <div className='p-2 text-sm'>
+                    <p className='text-xs'>{brand}</p>
                     <span className='font-medium'>{name.length > 60 ? name.substring(0, 60) + "..." : name}</span>
                 </div>
                 
@@ -75,7 +76,7 @@ const ProductList = (props) => {
 
                 {props.products.length > 0 ?
                     props.products.map((x, index) => (
-                        <React.Fragment key={index}>{product(x.image, x.name, x.price, x.id)}</React.Fragment>
+                        <React.Fragment key={index}>{product(x.image, x.name, x.price, x.id, x.brand)}</React.Fragment>
                     ))
                     :
                     <Empty className='mx-auto scale-125' image={Empty.PRESENTED_IMAGE_SIMPLE} description={"Ürün bulunamadı"} />}
