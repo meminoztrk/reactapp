@@ -12,6 +12,7 @@ const Products = () => {
   const [productNav, setProductNav] = useState([]);
   const [features, setFeatures] = useState([]);
   const [filter, setFilter] = useState({});
+  const [sort, setSort] = useState("smartSort");
 
   const getAllData = async (loc) => {
     await fetch(process.env.REACT_APP_API + "/Products/GetProductsByCategoryName", {
@@ -26,8 +27,8 @@ const Products = () => {
       .then(data => {
         // console.log(data.data);
         setBreadcrumb(data.data.navigation);
-        setProducts(data.data.products);
-        allProducts = data.data.products;
+        setProducts(data.data.products.sort((a, b) => a.id - b.id));
+        allProducts = data.data.products.sort((a, b) => a.id - b.id);
         setProductNav(data.data.productNav)
         setFeatures(data.data.productFeatures);
       })
@@ -36,25 +37,46 @@ const Products = () => {
   const pFilters = (filt, value, isSearch, isPrice) => {
     let newItem = { ...filter };
 
-    if(isSearch){
-      if(value.length > 0){
-        setFilter({...filter, search: value})
+    if (isSearch) {//arama filtrelemesi
+      if (value.length > 0) {
+        setFilter({ ...filter, search: value })
+      }
+      else {
+        delete newItem[filt]
+        setFilter(newItem)
+      }
+    }
+
+    else if (isPrice) {//fiyat filtrelemesi
+      if (value != null) {
+        setFilter({ ...filter, price: value })
+      } else {
+        delete newItem[filt]
+        setFilter(newItem)
+      }
+
+    }
+
+    else if (filt === 'features') {//dinamik checkbox filtrelemesi
+      if (filter[filt] === undefined) {
+        setFilter({ ...filter, [filt]: [{name: value.name, value: [value.val]}] })
       }
       else{
-        delete newItem[filt]
+        if(newItem[filt].some(x=>x.name === value.name)){
+          var selectedItem = newItem[filt].find(x=>x.name === value.name).value;
+          !selectedItem.includes(value.val) ? 
+          selectedItem.push(value.val) :
+          selectedItem.splice(selectedItem.indexOf(value.val),1)
+          selectedItem.length < 1 && newItem[filt].splice(newItem[filt].indexOf(value.name),1);
+          newItem[filt].length < 1 && delete newItem[filt]
+        }else{
+          newItem[filt].push({name: value.name, value: [value.val]})
+        }
         setFilter(newItem)
       }
     }
-    else if(isPrice){
-      if(value != null){
-        setFilter({...filter, price: value})
-      }else{
-        delete newItem[filt]
-        setFilter(newItem)
-      }
-      
-    }
-    else{
+
+    else {//standart checkbox filtrelemesi
       if (filter[filt] === undefined) {
         setFilter({ ...filter, [filt]: [value] })
       }
@@ -64,36 +86,48 @@ const Products = () => {
         setFilter(newItem)
       }
     }
-    
+
   };
 
   useEffect(() => {
     let lastdata = [];
 
-    console.log(filter)
     lastdata = lastdata.concat(allProducts.filter(x =>
       (!filter.brand || filter.brand.length < 1 || filter.brand.includes(x.brand)) &&
       (!filter.color || filter.color.length < 1 || filter.color.includes(x.color)) &&
       (!filter.status || filter.status.length < 1 || filter.status.includes(x.status)) &&
       (!filter.price || (x.price > filter.price.min && x.price < filter.price.max)) &&
-      (!filter.search || filter.search.length < 1 || x.name.toLowerCase().includes(filter.search.toLowerCase())) 
+      (!filter.search || filter.search.length < 1 || x.name.toLowerCase().includes(filter.search.toLowerCase())) &&
+      (!filter.features || filter.features.length < 1 || x.features.some(n => filter.features.some(m => m.name === n.name && m.value.some(v => n.value.includes(v)))))
     ));
 
-    setProducts(Object.keys(filter).length < 1 ? allProducts : lastdata);
-    setProductNav({categoryName: productNav.categoryName,   productCount: lastdata.length});  
-  }, [filter]);
+    var sentData = Object.keys(filter).length < 1 ? allProducts : lastdata;
+    if (sort === "maxToMin") {
+      sentData.sort((a, b) => b.price - a.price);
+    }
+    else if (sort === "minToMax") {
+      sentData.sort((a, b) => a.price - b.price);
+    } 
+    else if (sort === "smartSort") {
+      sentData.sort((a, b) => a.id - b.id);
+    }
 
-  // useEffect(() => {
-  //   let lastdata = [];
-  //   for (var key in filter) {
-  //     filter[key].map(item => {
-  //       lastdata = lastdata.concat(allProducts.filter(x => x[key] === item))
-  //     })
-  //   }
-  //   console.log(lastdata, allProducts);
-  //   setProducts(lastdata);
-  // }, [filter]);
+    setProducts(sentData);
+    setProductNav({ ...productNav, productCount: lastdata.length });
+  }, [filter]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const sortBy = (opt) => {
+    setSort(opt);
+    if (opt === "maxToMin") {
+      setProducts(products.sort((a, b) => b.price - a.price));
+    }
+    else if (opt === "minToMax") {
+      setProducts(products.sort((a, b) => a.price - b.price));
+    } 
+    else if (opt === "smartSort") {
+      setProducts(products.sort((a, b) => a.id - b.id));
+    }
+  }
 
   useEffect(() => {
     let categories = location.pathname.split('/')
@@ -112,8 +146,8 @@ const Products = () => {
         })}
       </Breadcrumb>
       <div className='flex py-4 justify-between space-x-4 h-full'>
-        <ProductFilter features={features} filter={pFilters} />
-        <ProductList products={products} nav={productNav} />
+        <ProductFilter features={features} filter={pFilters}/>
+        <ProductList products={products} sort={sortBy}  nav={productNav} />
       </div>
 
     </div>

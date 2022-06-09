@@ -27,17 +27,17 @@ const ProductFilter = (props) => {
         setPrice({ min: null, max: null });
         // let resetBrands = new Array(props.features.brands.length).fill(false);
         setCheckBoxes({
-            brands: [false, false, false, false, false],
-            ratings: [false, false, false, false, false],
-            colors: [false, false],
-            status: [false, false],
+            brands: [false],
+            ratings: [false],
+            colors: [false],
+            status: [false],
         });
     }, [location.pathname])
 
     const onSearch = (value) => props.filter('search', value, true, false);
 
     const onRadioClick = (val,min,max) => {
-        if(value){
+        if(value === val){
             setValue(0);
             props.filter('price',null,false,true);
         }else{
@@ -128,6 +128,7 @@ const ProductFilter = (props) => {
                                     <Checkbox
                                         // checked={checkBoxes.colors[index] ? true : false}
                                         // onChange={e => onChangeBox(e, index, 'colors')}
+                                        onClick={() => props.filter('features', {name:x.name,val:item}, false, false)}
                                         key={index}
                                         className='text-xs'>
                                         {item}
@@ -160,15 +161,15 @@ const ProductFilter = (props) => {
                 <Panel header="Durumu" key="7">
 
                     <Space direction="vertical" className='font-light pl-1'>
-                        {["Sıfır", "İkinci El"].map((item, index) => (
+                        {[false, true].map((item, index) => (
                             <Checkbox
                                 checked={checkBoxes.status[index] ? true : false}
                                 onChange={e => onChangeBox(e, index, 'status')}
-                                onClick={() => props.filter('status', item === "Sıfır" ? false : true, false, false)}
+                                onClick={() => props.filter('status', item, false, false)}
                                 key={index}
                                 value={index}
                                 className='text-xs'>
-                                {item}
+                                {item === false ? "Sıfır" : "İkinci El"}
                             </Checkbox>
                         ))}
                     </Space>

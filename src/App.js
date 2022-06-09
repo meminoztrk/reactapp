@@ -19,6 +19,7 @@ import CatFeature from './admin/CatFeature';
 import ProductAdd from './admin/ProductAdd';
 import AProducts from './admin/Products'
 import ProductEdit from './admin/ProductEdit';
+import ProductDetails from './containers/ProductDetails';
 
 function App() {
 
@@ -54,6 +55,7 @@ function App() {
         <Route path="/kayit" element={<Register />} />
         <Route path="/sepet" element={<Basket />} />
         <Route path="/kategori/*" element={<Products />} />
+        <Route path="/urunler/:category/:name/:id" element={<ProductDetails />} />
         <Route path="*" element={<MainNotFound />} />
 
         <Route path="/admin" element={<AppAdmin />}>
