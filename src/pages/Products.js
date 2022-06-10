@@ -13,8 +13,10 @@ const Products = () => {
   const [features, setFeatures] = useState([]);
   const [filter, setFilter] = useState({});
   const [sort, setSort] = useState("smartSort");
+  const [loading, setLoading] = useState(false);
 
   const getAllData = async (loc) => {
+    setLoading(true);
     await fetch(process.env.REACT_APP_API + "/Products/GetProductsByCategoryName", {
       method: 'POST',
       body: JSON.stringify(loc),
@@ -31,6 +33,7 @@ const Products = () => {
         allProducts = data.data.products.sort((a, b) => a.id - b.id);
         setProductNav(data.data.productNav)
         setFeatures(data.data.productFeatures);
+        setLoading(false)
       })
   }
 
@@ -147,7 +150,7 @@ const Products = () => {
       </Breadcrumb>
       <div className='flex py-4 justify-between space-x-4 h-full'>
         <ProductFilter features={features} filter={pFilters}/>
-        <ProductList products={products} sort={sortBy}  nav={productNav} />
+        <ProductList products={products} sort={sortBy}  nav={productNav} loading={loading}/>
       </div>
 
     </div>

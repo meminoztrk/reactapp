@@ -3,7 +3,7 @@ import Select from 'react-select'
 import colourStyles from '../hooks/selectColourStyles'
 import { useLocation, Link } from 'react-router-dom';
 import { Rating } from '@mui/material';
-import { Empty } from 'antd';
+import { Empty, Spin } from 'antd';
 import UseSeoHelper from './../hooks/useSeoHelper';
 
 const options = [
@@ -53,7 +53,6 @@ const ProductList = (props) => {
                         </div>
                         <div className='flex'>
                             <span className='block bg-red-700 py-1 px-2 text-xs rounded-lg text-white'>Süper Fiyat</span>
-
                         </div>
                     </div>
                     <div className='hidden group-hover:block'>
@@ -66,28 +65,27 @@ const ProductList = (props) => {
 
     return (
         <div className='w-4/5 bg-white rounded-md p-6 border-gray-300 border-opacity-100 border-x-2 border-y shadow'>
-            <div className='flex justify-between items-center'>
-                <div className='p-2'>
-                    <span className='text-sm font-light'><b className='font-semibold'>{props.nav.categoryName}</b> kategorisinde <b className='font-semibold'>{props.nav.productCount}</b> adet ürün bulundu.</span>
+            <Spin spinning={props.loading}>
+                <div className='flex justify-between items-center'>
+                    <div className='p-2'>
+                        <span className='text-sm font-light'><b className='font-semibold'>{props.nav.categoryName}</b> kategorisinde <b className='font-semibold'>{props.nav.productCount}</b> adet ürün bulundu.</span>
+                    </div>
+
+                    <div className='w-60 text-sm'>
+                        <Select onChange={(e) => { setRegion(e); props.sort(e.value) }} styles={colourStyles} value={region} defaultValue={options[0]} options={options} isSearchable={false} noOptionsMessage={() => 'Seçenek bulunamadı'} />
+                    </div>
                 </div>
+                <div className='flex flex-wrap mt-4'>
 
-                <div className='w-60 text-sm'>
-                    <Select onChange={(e) => { setRegion(e); props.sort(e.value) }} styles={colourStyles} value={region} defaultValue={options[0]} options={options} isSearchable={false} noOptionsMessage={() => 'Seçenek bulunamadı'} />
+                    {props.products.length > 0 ?
+                        props.products.map((x, index) => (
+                            <React.Fragment key={index}>{product(x.image, x.name, x.price, x.id, x.brand)}</React.Fragment>
+                        ))
+                        :
+                        <Empty className='mx-auto scale-125' image={Empty.PRESENTED_IMAGE_SIMPLE} description={"Ürün bulunamadı"} />}
+
                 </div>
-            </div>
-            <div className='flex flex-wrap mt-4'>
-
-                {props.products.length > 0 ?
-                    props.products.map((x, index) => (
-                        <React.Fragment key={index}>{product(x.image, x.name, x.price, x.id, x.brand)}</React.Fragment>
-                    ))
-                    :
-                    <Empty className='mx-auto scale-125' image={Empty.PRESENTED_IMAGE_SIMPLE} description={"Ürün bulunamadı"} />}
-
-
-
-
-            </div>
+            </Spin>
         </div>
     )
 }
