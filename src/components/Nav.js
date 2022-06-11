@@ -10,6 +10,7 @@ import { User } from '../stores/user';
 const Nav = (props) => {
     const categories = useSelector(state => state.category.mainCategories);
     const isHidden = useSelector(state => state.category.visibility);
+    const [visible, setVisible] = useState(false);
     const user = useSelector(state => state.user.user);
     const cart = useSelector(state => state.user.cart);
     const [menu, setMenu] = useState(<></>);
@@ -18,6 +19,10 @@ const Nav = (props) => {
     useEffect(() => {
         dispatch(getMainCategory())
     }, []);
+
+    const handleVisibleChange = (newVisible) => {
+        setVisible(newVisible);
+    };
 
     const toggleActive = (index) => {
         dispatch(setMenuVisibility({ display: "block", actState: index }))
@@ -56,16 +61,40 @@ const Nav = (props) => {
     );
 
     const cartDesign = (
-        <div className='font-poppins cursor-pointer text-[13px] w-80 py-2 pr-2'>
-            <p className='text-orange-500'>{cart.length}</p><hr />
-            <div className='space-y-2 mt-4'>
-                <Row className='text-gray-600 hover:text-orange-500 flex items-center'>
-                    <Col span={4} className="justify-center flex pr-2"><i className="fas fa-shopping-cart text-xs"></i></Col>
-                    <Col span={20}>Siparişlerim</Col>
-                </Row>
-                <Row className='text-gray-600 hover:text-orange-500 flex items-center' onClick={logout}>
-                    <Col span={4} className="justify-center flex pr-2"><i className="fas  fa-sign-out-alt text-xs"></i></Col>
-                    <Col span={20}>Çıkış Yap</Col>
+        <div className='font-poppins text-[13px] w-80 py-2 pr-2'>
+            <p className='text-black font-semibold'>Sepetim ({cart.length} Ürün)</p>
+            <hr />
+            <div className='space-y-2 divide-y'>
+                {cart.map((item, index) =>
+                    <Row key={index} className='text-gray-600 flex items-start pt-2'>
+                        <Col span={6} className="justify-center flex pr-2">
+                            <div className="border rounded-lg shadow p-1">
+                                <img src={item.image} ></img>
+                            </div>
+                        </Col>
+                        <Col span={18}>
+                            <p className='text-xs font-medium'>{item.name}</p>
+                            <p className='text-xs text-gray-400'>Adet: {item.count}</p>
+                            <p>{item.price.toFixed(2).toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')} TL</p>
+                        </Col>
+                        <button className='absolute right-0 mt-5 mr-8 bg-gray-100 px-2 py-1 rounded-xl hover:bg-gray-300'><i className='fa fa-trash' /></button>
+                        <hr />
+                    </Row>
+                )}
+            </div>
+            <div className='mt-4'>
+                <hr />
+                <Row className='text-gray-600 mt-4'>
+                    <Col span={12} className="flex justify-center">
+                        <Link to="/sepet" className=' bg-gray-200 text-gray-600 w-full rounded-md mr-1 py-2 font-semibold text-center' onClick={() => setVisible(false)} >
+                            Sepete Git
+                        </Link>
+                    </Col>
+                    <Col span={12} className="flex justify-center">
+                        <Link to="/sepet" className=' bg-orange-500 text-white w-full rounded-md ml-1 py-2 font-semibold text-center' onClick={() => setVisible(false)} >
+                            Siparişi Tamamla
+                        </Link>
+                    </Col>
                 </Row>
             </div>
         </div>
@@ -74,7 +103,7 @@ const Nav = (props) => {
 
     useEffect(() => {
         checkMenu();
-    }, [user, cart])
+    }, [user, cart, visible])
 
 
 
@@ -96,7 +125,7 @@ const Nav = (props) => {
                     </Link>
                     <Popover placement="bottom" content={cartDesign} trigger="hover">
                         <Link to="/sepet">
-                            <Badge count={5} showZero>
+                            <Badge count={cart.length}>
                                 <li className="text-center hover:text-orange-500">
                                     <i className="fas fa-shopping-cart text-xl"></i>
                                     <p className='text-xs'>Sepetim</p>
@@ -123,7 +152,7 @@ const Nav = (props) => {
                             <p className='text-xs'>Favorilerim</p>
                         </li>
                     </Link>
-                    <Popover placement="bottomRight" content={cartDesign} trigger="hover">
+                    <Popover placement="bottomRight" content={cartDesign} visible={visible} onVisibleChange={handleVisibleChange} trigger="hover">
                         <Link to="/sepet" className="" >
                             <Badge count={cart.length} size="small" color={"#f97316"}>
                                 <li className="text-center hover:text-orange-500">
@@ -179,7 +208,6 @@ const Nav = (props) => {
                                 <p className='text-xs pl-2 font-semibold'>424-00-42</p>
                                 <p className='text-xs text-gray-400 pl-2'>Osmangazi</p>
                             </li>
-                            {cart.length}
                             <li className="text-center flex items-center">
                                 <i className="fas fa-map-marker-alt text-xl"></i>
                                 <p className='text-xs pl-2'>Bursa</p>
@@ -209,6 +237,7 @@ const Nav = (props) => {
 
                     <div className=''>
                         {menu}
+
                     </div>
 
                 </div>

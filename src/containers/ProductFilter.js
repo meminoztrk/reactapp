@@ -49,7 +49,7 @@ const ProductFilter = (props) => {
 
 
     return (
-        <div className='w-1/5 bg-white rounded-md py-2 border-gray-300 border-opacity-100 border-x-2 border-y shadow divide-y-2'>
+        <div className='w-1/5 bg-white rounded-md py-2 border-gray-300 border-opacity-100 border-x-2 border-y shadow'>
             <Collapse bordered={false} className="bg-white font-medium gap-y-5 pb-12 site-collapse-custom-collapse" expandIconPosition="right" defaultActiveKey={['1', '2', '3', '4', '5', '6', '7', "a0", "a1", "a2", "a3"]}>
                 <Panel header="Kategoriler" key="1">
                     <div className='text-xs font-light pb-4'>
