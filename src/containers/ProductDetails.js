@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 import { Breadcrumb, Tabs, Rate, BackTop } from 'antd';
 import { BsTruck, BsFillCartFill } from 'react-icons/bs';
@@ -45,12 +44,6 @@ const ProductDetails = () => {
   useEffect(() => {
     if (id && id !== "") getProduct(id);
   }, [id]);
-
-  function htmlDecode(input){
-    var e = document.createElement('div');
-    e.innerHTML = input;
-    return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
-  }
 
   const toggleActiveColor = (index) => {
     if (color === index) { return "border-orange-400 text-orange-500" } else { return "border-gray-400 text-gray-500" }

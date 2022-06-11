@@ -20,38 +20,29 @@ import ProductAdd from './admin/ProductAdd';
 import AProducts from './admin/Products'
 import ProductEdit from './admin/ProductEdit';
 import ProductDetails from './containers/ProductDetails';
+import { useDispatch, useSelector } from 'react-redux';
+import { User } from './stores/user';
+
+
 
 function App() {
 
-  const [name, setName] = useState();
   const location = useLocation();
+  const dispatch = useDispatch();
   const origin = location.pathname.split("/")[1];
-  useEffect(() => {
-    (
-      async () => {
-        const response = await fetch(process.env.REACT_APP_API+'/User/user', {
-          headers: { 
-            'ApiKey':process.env.REACT_APP_API_KEY,
-            'Content-Type': 'application/json' },
-          credentials: 'include',
-        });
 
-        const content = await response.json();
-        console.log(content)
-        setName(content.username);
-        console.log("app js tarafında name " + content.username)
-      }
-    )();
-  },[])
+  useEffect(() => {
+    dispatch(User());
+  }, [])
 
   return (
     <div className="font-poppins">
 
 
-      {origin !== 'admin' ? <Nav name={name} setName={setName} /> : null}
+      {origin !== 'admin' ? <Nav /> : null}
       <Routes>
-        <Route path="/" exact element={<Home name={name} setName={setName} />} />
-        <Route path="/giris" element={<Login setName={setName} />} />
+        <Route path="/" exact element={<Home />} />
+        <Route path="/giris" element={<Login />} />
         <Route path="/kayit" element={<Register />} />
         <Route path="/sepet" element={<Basket />} />
         <Route path="/kategori/*" element={<Products />} />
@@ -61,7 +52,7 @@ function App() {
         <Route path="/admin" element={<AppAdmin />}>
           <Route index element={<Dashboard />} />
           <Route path="/admin/kategoriler" element={<Categories />} />
-          <Route path='/admin/kategori-ozellik' element={<CatFeature/>}/>
+          <Route path='/admin/kategori-ozellik' element={<CatFeature />} />
           <Route path="/admin/markalar" element={<Brand />} />
           <Route path="/admin/siparisler" element={<Orders />} />
           <Route path="/admin/urunler" element={<AProducts />} />

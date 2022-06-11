@@ -162,9 +162,13 @@ function Register() {
         e.preventDefault();
         if (formValid === true) {
             setLoading(true)
-            await fetch('https://localhost:8000/api/register', {
+            await fetch(process.env.REACT_APP_API + "/User/register", {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'ApiKey': process.env.REACT_APP_API_KEY,
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
                 body: JSON.stringify({
                     name: name,
                     surname: surname,
@@ -174,14 +178,14 @@ function Register() {
                 })
             }).then(response => {
                 if (response.ok) {
-                    navigate("/login");
+                    navigate("/giris");
                 }
             })
                 .catch(function (err) {
                     console.info(err);
                     setValidMessage("Bir hata oluştu!")
                 });
-                setLoading(false)
+            setLoading(false)
         }
         else {
             setValidMessage("Eksik veya hatalı bilgi girdiniz!")
@@ -257,7 +261,7 @@ function Register() {
 
                 </form>
                 <p className="text-center text-gray-500 text-xs">
-                    &copy;2020 Meminoztrk
+                    &copy;2022 Meminoztrk
                 </p>
             </div>
         </div>

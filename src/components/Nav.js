@@ -3,80 +3,28 @@ import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux';
 import { getMainCategory, setMenuVisibility } from '../stores/category';
 import NavSubCategories from '../containers/NavSubCategories';
-
-
+import { Popover, Col, Row, Badge } from 'antd';
+import { User } from '../stores/user';
 
 
 const Nav = (props) => {
     const categories = useSelector(state => state.category.mainCategories);
     const isHidden = useSelector(state => state.category.visibility);
+    const user = useSelector(state => state.user.user);
+    const cart = useSelector(state => state.user.cart);
+    const [menu, setMenu] = useState(<></>);
 
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(getMainCategory())
     }, []);
 
-    const [actState, setActState] = useState(-1)
-    // const [isHidden, setIsHidden] = useState("hidden")
-
-
     const toggleActive = (index) => {
-        // setActState(index)
-        // setIsHidden("block")
-        dispatch(setMenuVisibility({display:"block",actState:index}))
+        dispatch(setMenuVisibility({ display: "block", actState: index }))
     }
     const toggleActiveStyles = (index) => {
         if (isHidden.actState === index) { return "activeNav pointer-events-none " } else { return "" }
     }
-
-    let menu;
-
-    if (props.name === undefined || props.name === '') {
-        menu = (
-            <ul className="flex space-x-8">
-                <Link to="/giris">
-                    <li className="text-center hover:text-orange-500">
-                        <i className="fas fa-sign-in-alt text-xl"></i>
-                        <p className='text-xs'>Giriş Yap</p>
-                    </li>
-                </Link>
-                <Link to="/kayit">
-                    <li className="text-center hover:text-orange-500">
-                        <i className="fas fa-user-plus text-xl"></i>
-                        <p className='text-xs'>Kayıt Ol</p>
-                    </li>
-                </Link>
-                <Link to="/sepet">
-                    <li className="text-center hover:text-orange-500">
-                        <i className="fas fa-shopping-cart text-xl"></i>
-                        <p className='text-xs'>Sepetim</p>
-                    </li>
-                </Link>
-            </ul>
-        )
-    } else {
-        menu = (
-            <ul className="flex space-x-8">
-                <li className="text-center hover:text-gray-500">
-                    <i className="fas fa-heart text-xl"></i>
-                    <p className='text-xs'>Favoriler</p>
-                </li>
-                <Link to="/giris" className="" onClick={logout} >
-                    <li className="text-center hover:text-gray-500">
-                        <i className="fas fa-sign-out-alt text-xl"></i>
-                        <p className='text-xs'>Hesabım</p>
-                    </li>
-                </Link>
-                <Link to="/sepet" className="" >
-                    <li className="text-center hover:text-gray-500">
-                        <i className="fas fa-shopping-cart text-xl"></i>
-                        <p className='text-xs'>Sepetim</p>
-                    </li>
-                </Link>
-            </ul>
-        )
-    }
-    // console.log("user nav " + props.name)
 
     const logout = async () => {
         await fetch('https://localhost:7168/api/User/logout', {
@@ -84,11 +32,115 @@ const Nav = (props) => {
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
         }).then(response => {
-            console.log(response)
+            dispatch(User())
         });
 
-        props.setName('');
+
     }
+
+
+    const content = (
+        <div className='font-poppins cursor-pointer text-[13px] py-2 pr-2'>
+            <p className='text-orange-500'>{user.email}</p><hr />
+            <div className='space-y-2 mt-4'>
+                <Row className='text-gray-600 hover:text-orange-500 flex items-center'>
+                    <Col span={4} className="justify-center flex pr-2"><i className="fas fa-shopping-cart text-xs"></i></Col>
+                    <Col span={20}>Siparişlerim</Col>
+                </Row>
+                <Row className='text-gray-600 hover:text-orange-500 flex items-center' onClick={logout}>
+                    <Col span={4} className="justify-center flex pr-2"><i className="fas  fa-sign-out-alt text-xs"></i></Col>
+                    <Col span={20}>Çıkış Yap</Col>
+                </Row>
+            </div>
+        </div>
+    );
+
+    const cartDesign = (
+        <div className='font-poppins cursor-pointer text-[13px] w-80 py-2 pr-2'>
+            <p className='text-orange-500'>{cart.length}</p><hr />
+            <div className='space-y-2 mt-4'>
+                <Row className='text-gray-600 hover:text-orange-500 flex items-center'>
+                    <Col span={4} className="justify-center flex pr-2"><i className="fas fa-shopping-cart text-xs"></i></Col>
+                    <Col span={20}>Siparişlerim</Col>
+                </Row>
+                <Row className='text-gray-600 hover:text-orange-500 flex items-center' onClick={logout}>
+                    <Col span={4} className="justify-center flex pr-2"><i className="fas  fa-sign-out-alt text-xs"></i></Col>
+                    <Col span={20}>Çıkış Yap</Col>
+                </Row>
+            </div>
+        </div>
+    );
+
+
+    useEffect(() => {
+        checkMenu();
+    }, [user, cart])
+
+
+
+    const checkMenu = () => {
+        if (!user.id) {
+            setMenu(
+                <ul className="flex space-x-8">
+                    <Link to="/giris">
+                        <li className="text-center hover:text-orange-500">
+                            <i className="fas fa-sign-in-alt text-xl"></i>
+                            <p className='text-xs'>Giriş Yap</p>
+                        </li>
+                    </Link>
+                    <Link to="/kayit">
+                        <li className="text-center hover:text-orange-500">
+                            <i className="fas fa-user-plus text-xl"></i>
+                            <p className='text-xs'>Kayıt Ol</p>
+                        </li>
+                    </Link>
+                    <Popover placement="bottom" content={cartDesign} trigger="hover">
+                        <Link to="/sepet">
+                            <Badge count={5} showZero>
+                                <li className="text-center hover:text-orange-500">
+                                    <i className="fas fa-shopping-cart text-xl"></i>
+                                    <p className='text-xs'>Sepetim</p>
+                                </li>
+                            </Badge>
+                        </Link>
+                    </Popover>
+                </ul>
+            )
+        } else {
+            setMenu(
+                <ul className="flex space-x-8">
+                    <Popover placement="bottom" content={content} trigger="hover">
+                        <Link to="/giris">
+                            <li className="text-center hover:text-orange-500">
+                                <i className="fas fa-user text-xl"></i>
+                                <p className='text-xs'>Hesabım</p>
+                            </li>
+                        </Link>
+                    </Popover>
+                    <Link to="/sepet" className="" >
+                        <li className="text-center hover:text-orange-500">
+                            <i className="fas fa-heart text-xl"></i>
+                            <p className='text-xs'>Favorilerim</p>
+                        </li>
+                    </Link>
+                    <Popover placement="bottomRight" content={cartDesign} trigger="hover">
+                        <Link to="/sepet" className="" >
+                            <Badge count={cart.length} size="small" color={"#f97316"}>
+                                <li className="text-center hover:text-orange-500">
+                                    <i className="fas fa-shopping-cart text-xl"></i>
+                                    <p className='text-xs'>Sepetim</p>
+                                </li>
+                            </Badge>
+                        </Link>
+                    </Popover>
+                </ul>
+            )
+        }
+    }
+
+    // console.log("user nav " + props.name)
+
+
 
     const wrapperRef = useRef([]);
     const wrapperRef2 = useRef([]);
@@ -103,7 +155,7 @@ const Nav = (props) => {
                 if (ref.current && !ref.current.contains(event.target) && !ref2.current.contains(event.target)) {
                     // setActState(-1);
                     // setIsHidden("hidden")
-                    dispatch(setMenuVisibility({display:"hidden",actState:-1}));
+                    dispatch(setMenuVisibility({ display: "hidden", actState: -1 }));
                 }
             }
             document.addEventListener("mousedown", handleClickOutside);
@@ -127,12 +179,13 @@ const Nav = (props) => {
                                 <p className='text-xs pl-2 font-semibold'>424-00-42</p>
                                 <p className='text-xs text-gray-400 pl-2'>Osmangazi</p>
                             </li>
+                            {cart.length}
                             <li className="text-center flex items-center">
                                 <i className="fas fa-map-marker-alt text-xl"></i>
                                 <p className='text-xs pl-2'>Bursa</p>
                             </li>
                             <li className="text-center hover:cursor-pointer">
-                               <Link to="/admin"><p className='text-xs'>Kampanyalar</p></Link> 
+                                <Link to="/admin"><p className='text-xs'>Kampanyalar</p></Link>
                             </li>
                         </ul>
                     </div>
