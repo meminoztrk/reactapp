@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { AiFillMail } from 'react-icons/ai';
 import { BsKeyFill } from 'react-icons/bs';
 import usePasswordToggle from './../hooks/usePasswordToggle';
-import { useSelector,useDispatch } from 'react-redux';
-import { User } from '../stores/user';
+import { useSelector, useDispatch } from 'react-redux';
+import { User,GetCart } from '../stores/user';
 
 
 const Login = (props) => {
@@ -15,22 +15,44 @@ const Login = (props) => {
 
     let navigate = useNavigate();
 
+    const addManyCart = async (userid) => {
+        await fetch(process.env.REACT_APP_API + '/Products/AddManyCart', {
+            method: 'POST',
+            headers: {
+                'ApiKey': process.env.REACT_APP_API_KEY,
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                userid: userid,
+                cart: JSON.parse(sessionStorage.getItem("userCart"))
+            })
+        }).then(response => response.json()).then(data => {
+            dispatch(GetCart(userid))
+        });
+    }
+
     const submit = async (e) => {
         e.preventDefault();
 
-        const response = await fetch('https://localhost:7168/api/User/login', {
+        await fetch(process.env.REACT_APP_API + '/User/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'ApiKey': process.env.REACT_APP_API_KEY,
+                'Content-Type': 'application/json'
+            },
             credentials: 'include',
             body: JSON.stringify({
                 email,
                 password
             })
+        }).then(response => response.json()).then(data => {
+            let cart = JSON.parse(sessionStorage.getItem("userCart"));
+            cart && cart.length > 0 ? addManyCart(data.data.id) : dispatch(GetCart(data.data.id));
+            sessionStorage.removeItem("userCart");
+            dispatch(User());
+            navigate("/");
         });
-        const content = await response.json();
-        dispatch(User());
-        navigate("/");
-
     }
 
 

@@ -5,6 +5,7 @@ import { getMainCategory, setMenuVisibility } from '../stores/category';
 import NavSubCategories from '../containers/NavSubCategories';
 import { Popover, Col, Row, Badge } from 'antd';
 import { User } from '../stores/user';
+import { deleteToCart,clearCart,GetCart } from '../stores/user';
 
 
 const Nav = (props) => {
@@ -20,6 +21,30 @@ const Nav = (props) => {
         dispatch(getMainCategory())
     }, []);
 
+    const removeCart = async (userId,productFeatureId) => {
+        await fetch(process.env.REACT_APP_API + '/Products/DeleteCart?userId=' + userId + '&productFeatureId=' + productFeatureId, {
+            method: 'DELETE',
+            headers: {
+                'ApiKey': process.env.REACT_APP_API_KEY,
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+        }).then(response => {
+            dispatch(GetCart(userId))
+        });
+    }
+
+    const deleteCartItem = (id) => {
+        if (user.id){
+            removeCart(user.id,id)
+        }else{
+            const getSessionCart = JSON.parse(sessionStorage.getItem("userCart"));
+            const newCart = getSessionCart.filter(x => x.id !== id);
+            sessionStorage.setItem("userCart", JSON.stringify(newCart));
+            dispatch(deleteToCart(id));
+        }
+    }
+
     const handleVisibleChange = (newVisible) => {
         setVisible(newVisible);
     };
@@ -32,15 +57,18 @@ const Nav = (props) => {
     }
 
     const logout = async () => {
-        await fetch('https://localhost:7168/api/User/logout', {
+        await fetch(process.env.REACT_APP_API + '/User/logout', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include'
+            headers: {
+                'ApiKey': process.env.REACT_APP_API_KEY,
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
         }).then(response => {
+            sessionStorage.removeItem("userCart");
+            dispatch(clearCart())
             dispatch(User())
         });
-
-
     }
 
 
@@ -65,7 +93,7 @@ const Nav = (props) => {
             <p className='text-black font-semibold'>Sepetim ({cart.length} Ürün)</p>
             <hr />
             <div className='space-y-2 divide-y'>
-                {cart.map((item, index) =>
+                {cart.length > 0 ? cart.map((item, index) =>
                     <Row key={index} className='text-gray-600 flex items-start pt-2'>
                         <Col span={6} className="justify-center flex pr-2">
                             <div className="border rounded-lg shadow p-1">
@@ -77,26 +105,29 @@ const Nav = (props) => {
                             <p className='text-xs text-gray-400'>Adet: {item.count}</p>
                             <p>{item.price.toFixed(2).toString().replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')} TL</p>
                         </Col>
-                        <button className='absolute right-0 mt-5 mr-8 bg-gray-100 px-2 py-1 rounded-xl hover:bg-gray-300'><i className='fa fa-trash' /></button>
+                        <button onClick={() => deleteCartItem(item.id)} className='absolute right-0 mt-5 mr-8 bg-gray-100 px-2 py-1 rounded-xl hover:bg-gray-300'><i className='fa fa-trash' /></button>
                         <hr />
                     </Row>
-                )}
+                ) : <p className='text-gray-600 text-sm py-4'>Sepetiniz ürün bulunmamaktadır.</p>}
             </div>
-            <div className='mt-4'>
-                <hr />
-                <Row className='text-gray-600 mt-4'>
-                    <Col span={12} className="flex justify-center">
-                        <Link to="/sepet" className=' bg-gray-200 text-gray-600 w-full rounded-md mr-1 py-2 font-semibold text-center' onClick={() => setVisible(false)} >
-                            Sepete Git
-                        </Link>
-                    </Col>
-                    <Col span={12} className="flex justify-center">
-                        <Link to="/sepet" className=' bg-orange-500 text-white w-full rounded-md ml-1 py-2 font-semibold text-center' onClick={() => setVisible(false)} >
-                            Siparişi Tamamla
-                        </Link>
-                    </Col>
-                </Row>
-            </div>
+            {cart.length > 0 &&
+                <div className='mt-4'>
+                    <hr />
+                    <Row className='text-gray-600 mt-4'>
+                        <Col span={12} className="flex justify-center">
+                            <Link to="/sepet" className=' bg-gray-200 text-gray-600 w-full rounded-md mr-1 py-2 font-semibold text-center' onClick={() => setVisible(false)} >
+                                Sepete Git
+                            </Link>
+                        </Col>
+                        <Col span={12} className="flex justify-center">
+                            <Link to="/sepet" className=' bg-orange-500 text-white w-full rounded-md ml-1 py-2 font-semibold text-center' onClick={() => setVisible(false)} >
+                                Siparişi Tamamla
+                            </Link>
+                        </Col>
+                    </Row>
+                </div>
+            }
+
         </div>
     );
 
@@ -123,9 +154,9 @@ const Nav = (props) => {
                             <p className='text-xs'>Kayıt Ol</p>
                         </li>
                     </Link>
-                    <Popover placement="bottom" content={cartDesign} trigger="hover">
+                    <Popover placement="bottomRight" content={cartDesign} visible={visible} onVisibleChange={handleVisibleChange} trigger="hover">
                         <Link to="/sepet">
-                            <Badge count={cart.length}>
+                            <Badge count={cart.length} size="small" color={"#f97316"}>
                                 <li className="text-center hover:text-orange-500">
                                     <i className="fas fa-shopping-cart text-xl"></i>
                                     <p className='text-xs'>Sepetim</p>
