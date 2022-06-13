@@ -22,7 +22,6 @@ const ProductList = (props) => {
     const location = useLocation();
     const [loading, setLoading] = useState(false);
     const [region, setRegion] = useState(options[0]);
-    const cart = useSelector(state => state.user.cart);
     const user = useSelector(state => state.user.user);
     const dispatch = useDispatch()
 
@@ -43,12 +42,13 @@ const ProductList = (props) => {
         });
     }
 
-    const addCart = (id, name, image, price, count) => {
+    const addCart = (id, name, image, price, count, color) => {
         setLoading(true)
         const cart = {
             id: id,
             name: name,
             image: image,
+            color: color,
             price: price,
             count: count
         }
@@ -86,7 +86,7 @@ const ProductList = (props) => {
     }, [location.pathname])
 
 
-    const product = (image, name, price, id, fid, brand) => (<div className='group xl:w-1/4 lg:w-1/3 w-1/2 p-2 h-[33rem] relative'>
+    const product = (image, name, price, id, fid, brand, color) => (<div className='group xl:w-1/4 lg:w-1/3 w-1/2 p-2 h-[33rem] relative'>
         <Link className='hover:text-black' to={"/urunler/" + UseSeoHelper(props.nav.categoryName ? props.nav.categoryName : "kategori") + "/" + UseSeoHelper(name) + "/" + id}>
             <div className='flex flex-col bg-white rounded-md border h-full group-hover:shadow-lg group-hover:drop-shadow-xl group-hover:border-gray-50 cursor-pointer p-2'>
                 <div className='h-1/2 flex justify-center'>
@@ -119,7 +119,7 @@ const ProductList = (props) => {
             </div>
         </Link>
         <div className='hidden group-hover:block px-2'>
-            <button {...loading ? { disabled: true } : { disabled: false }} onClick={() => dispatch(addToCart(addCart(fid, name, image, price, 1)))} 
+            <button {...loading ? { disabled: true } : { disabled: false }} onClick={() => dispatch(addToCart(addCart(fid, name, image, price, 1, color)))} 
             className='bg-orange-500 ease-out hover:bg-orange-700 mb-6 ml-1 text-sm absolute bottom-0 w-[calc(100%-40px)] rounded-md text-white py-2 px-4'>
                 {loading ? (<svg role="status" className="inline mr-2 w-6 h-6 text-gray-200 animate-spin dark:text-gray-500 fill-white" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
@@ -145,7 +145,7 @@ const ProductList = (props) => {
 
                     {props.products.length > 0 ?
                         props.products.map((x, index) => (
-                            <React.Fragment key={index}>{product(x.image, x.name, x.price, x.id, x.productFeatureId, x.brand)}</React.Fragment>
+                            <React.Fragment key={index}>{product(x.image, x.name, x.price, x.id, x.productFeatureId, x.brand , x.color)}</React.Fragment>
                         ))
                         :
                         <Empty className='mx-auto scale-125' image={Empty.PRESENTED_IMAGE_SIMPLE} description={"Ürün bulunamadı"} />}

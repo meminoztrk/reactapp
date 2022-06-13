@@ -18,6 +18,15 @@ const user = createSlice({
                 state.cart.find(x => x.id === action.payload.id).count++ :
                 state.cart.push(action.payload);
         },
+        increaseQuantity: (state, action) => {
+            state.cart.find(x => x.id === action.payload) &&
+                state.cart.find(x => x.id === action.payload).count++
+        },
+        decreaseQuantity: (state, action) => {
+            state.cart.find(x => x.id === action.payload) &&
+                state.cart.find(x => x.id === action.payload).count--
+
+        },
         deleteToCart: (state, action) => {
             state.cart.find(x => x.id === action.payload) &&
                 (state.cart = state.cart.filter(x => x.id !== action.payload))
@@ -32,7 +41,7 @@ const user = createSlice({
     },
 })
 
-export const { getUser, addToCart, deleteToCart, setCartWithDB, clearCart } = user.actions
+export const { getUser, addToCart, deleteToCart, setCartWithDB, clearCart, increaseQuantity, decreaseQuantity } = user.actions
 
 export default user.reducer
 
@@ -45,7 +54,10 @@ export const User = () => async dispatch => {
             },
             withCredentials: true,
         })
-        .then(response => dispatch({ type: getUser.type, payload: response.data }))
+        .then(response => {
+            dispatch({ type: getUser.type, payload: response.data })
+            dispatch(GetCart(response.data.id));
+        })
         .catch((err) => {
             dispatch({ type: getUser.type, payload: {} })
         });

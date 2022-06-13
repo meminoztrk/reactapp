@@ -4,7 +4,7 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 import Nav from './components/Nav';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Footer from './components/Footer';
 import Basket from './pages/Basket';
 import Products from './pages/Products';
@@ -20,7 +20,7 @@ import ProductAdd from './admin/ProductAdd';
 import AProducts from './admin/Products'
 import ProductEdit from './admin/ProductEdit';
 import ProductDetails from './containers/ProductDetails';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { User } from './stores/user';
 
 
