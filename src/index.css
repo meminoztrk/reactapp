@@ -146,3 +146,19 @@ input::-webkit-inner-spin-button {
 .ant-popover-inner {
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
+
+.userNav .ant-menu-item:after, .ant-menu-vertical-left .ant-menu-item:after, .ant-menu-vertical-right .ant-menu-item:after, .ant-menu-vertical .ant-menu-item:after {
+  border-right: 3px solid #fb923c;
+}
+
+.userNav .ant-menu-item:hover, .ant-menu-item a:hover, .ant-menu-vertical-left .ant-menu-item:after, .ant-menu-vertical-right .ant-menu-item:after, .ant-menu-vertical .ant-menu-item:after {
+  color:#fb923c;
+}
+
+.userNav:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  background-color: #fff1e7;
+}
+
+.ant-menu-item-selected, .ant-menu-item-selected a, .ant-menu-item-selected a:hover {
+  color: #fb923c;
+}

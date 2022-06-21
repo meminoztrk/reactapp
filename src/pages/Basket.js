@@ -130,7 +130,7 @@ const Basket = () => {
             </div>
             <div className='w-[25%]'>
 
-              <Link to="/" className='font-medium flex bg-orange-500 hover:bg-orange-700 text-white w-full rounded-lg py-3 text-lg text-center'>
+              <Link to={user.id ? "/odeme" : "/giris"} className='font-medium flex bg-orange-500 hover:bg-orange-700 text-white w-full rounded-lg py-3 text-lg text-center'>
                 <p className='flex items-center mx-auto'>Sepeti Onayla <span className='text-3xl pl-2'>{">"}</span></p>
               </Link>
 
@@ -150,7 +150,7 @@ const Basket = () => {
                 </div>
               </div>
 
-              <Link to="/" className='font-medium flex bg-orange-500 hover:bg-orange-700 text-white w-full rounded-lg py-3 mt-8 text-lg text-center'>
+              <Link to={user.id ? "/odeme" : "/giris"}className='font-medium flex bg-orange-500 hover:bg-orange-700 text-white w-full rounded-lg py-3 mt-8 text-lg text-center'>
                 <p className='flex items-center mx-auto'>Sepeti Onayla <span className='text-3xl pl-2'>{">"}</span></p>
               </Link>
 

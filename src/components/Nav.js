@@ -5,13 +5,14 @@ import { getMainCategory, setMenuVisibility } from '../stores/category';
 import NavSubCategories from '../containers/NavSubCategories';
 import { Popover, Col, Row, Badge } from 'antd';
 import { User } from '../stores/user';
-import { deleteToCart,clearCart,GetCart } from '../stores/user';
+import { deleteToCart, clearCart, GetCart } from '../stores/user';
 
 
 const Nav = (props) => {
     const categories = useSelector(state => state.category.mainCategories);
     const isHidden = useSelector(state => state.category.visibility);
     const [visible, setVisible] = useState(false);
+    const [uvisible, setUvisible] = useState(false);
     const user = useSelector(state => state.user.user);
     const cart = useSelector(state => state.user.cart);
     const [menu, setMenu] = useState(<></>);
@@ -21,7 +22,7 @@ const Nav = (props) => {
         dispatch(getMainCategory())
     }, []);
 
-    const removeCart = async (userId,productFeatureId) => {
+    const removeCart = async (userId, productFeatureId) => {
         await fetch(process.env.REACT_APP_API + '/Products/DeleteCart?userId=' + userId + '&productFeatureId=' + productFeatureId, {
             method: 'DELETE',
             headers: {
@@ -35,15 +36,19 @@ const Nav = (props) => {
     }
 
     const deleteCartItem = (id) => {
-        if (user.id){
-            removeCart(user.id,id)
-        }else{
+        if (user.id) {
+            removeCart(user.id, id)
+        } else {
             const getSessionCart = JSON.parse(sessionStorage.getItem("userCart"));
             const newCart = getSessionCart.filter(x => x.id !== id);
             sessionStorage.setItem("userCart", JSON.stringify(newCart));
             dispatch(deleteToCart(id));
         }
     }
+
+    const handleUserVisibleChange = (newVisible) => {
+        setUvisible(newVisible);
+    };
 
     const handleVisibleChange = (newVisible) => {
         setVisible(newVisible);
@@ -75,12 +80,20 @@ const Nav = (props) => {
     const content = (
         <div className='font-poppins cursor-pointer text-[13px] py-2 pr-2'>
             <p className='text-orange-500'>{user.email}</p><hr />
-            <div className='space-y-2 mt-4'>
-                <Row className='text-gray-600 hover:text-orange-500 flex items-center'>
-                    <Col span={4} className="justify-center flex pr-2"><i className="fas fa-shopping-cart text-xs"></i></Col>
-                    <Col span={20}>Siparişlerim</Col>
-                </Row>
-                <Row className='text-gray-600 hover:text-orange-500 flex items-center' onClick={logout}>
+            <div className='mt-4'>
+                <Link to="/hesabim/siparisler" onClick={() => setUvisible(false)}>
+                    <Row className='text-gray-600 hover:text-orange-500 flex items-center'>
+                        <Col span={4} className="justify-center flex pr-2"><i className="fas fa-shopping-cart text-xs"></i></Col>
+                        <Col span={20}>Siparişlerim</Col>
+                    </Row>
+                </Link>
+                <Link to="/hesabim/profil" onClick={() => setUvisible(false)}>
+                    <Row className='text-gray-600 hover:text-orange-500 flex items-center pt-1'>
+                        <Col span={4} className="justify-center flex pr-2"><i className="fas fa-user text-xs"></i></Col>
+                        <Col span={20}>Profilim</Col>
+                    </Row>
+                </Link>
+                <Row className='text-gray-600 hover:text-orange-500 flex items-center pt-1' onClick={logout}>
                     <Col span={4} className="justify-center flex pr-2"><i className="fas  fa-sign-out-alt text-xs"></i></Col>
                     <Col span={20}>Çıkış Yap</Col>
                 </Row>
@@ -134,7 +147,7 @@ const Nav = (props) => {
 
     useEffect(() => {
         checkMenu();
-    }, [user, cart, visible])
+    }, [user, cart, visible, uvisible])
 
 
 
@@ -169,13 +182,11 @@ const Nav = (props) => {
         } else {
             setMenu(
                 <ul className="flex space-x-8">
-                    <Popover placement="bottom" content={content} trigger="hover">
-                        <Link to="/giris">
-                            <li className="text-center hover:text-orange-500">
-                                <i className="fas fa-user text-xl"></i>
-                                <p className='text-xs'>Hesabım</p>
-                            </li>
-                        </Link>
+                    <Popover placement="bottom" content={content} visible={uvisible} onVisibleChange={handleUserVisibleChange} trigger="hover">
+                        <li className="text-center hover:text-orange-500 cursor-pointer">
+                            <i className="fas fa-user text-xl"></i>
+                            <p className='text-xs'>Hesabım</p>
+                        </li>
                     </Popover>
                     <Link to="/sepet" className="" >
                         <li className="text-center hover:text-orange-500">
@@ -268,7 +279,6 @@ const Nav = (props) => {
 
                     <div className=''>
                         {menu}
-
                     </div>
 
                 </div>

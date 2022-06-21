@@ -119,8 +119,8 @@ const ProductAdd = () => {
             .catch(function (error) {
                 console.log(error.toJSON());
               });
-
     }
+    
     useEffect(() => {
         getCategories()
         getBrands()

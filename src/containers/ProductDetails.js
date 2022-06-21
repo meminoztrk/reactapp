@@ -38,7 +38,11 @@ const ProductDetails = () => {
       .then(data => {
         setProduct(data.data);
         setBreadcrumb(data.data.navigation);
-        setSelected({ productFeatureId: data.data.features[0].id, color: data.data.features[0].color, price: data.data.features[0].fePrice, cdx: 0, quantity: 1 });
+        setSelected({ productFeatureId: data.data.features[0].id, 
+                      color: data.data.features[0].color, 
+                      price: data.data.features[0].fePrice, 
+                      cdx: 0, 
+                      quantity: 1 });
       })
   }
 

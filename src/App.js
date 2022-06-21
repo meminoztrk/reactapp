@@ -22,6 +22,11 @@ import ProductEdit from './admin/ProductEdit';
 import ProductDetails from './containers/ProductDetails';
 import { useDispatch } from 'react-redux';
 import { User } from './stores/user';
+import AppAccount from './account/AppAccount';
+import UserOrders from './account/UserOrders';
+import { UserProfile } from './account/UserProfile';
+import { Pay } from './pages/Pay';
+import OrdersCompleted from './admin/OrdersCompleted';
 
 
 
@@ -33,12 +38,10 @@ function App() {
 
   useEffect(() => {
     dispatch(User());
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="font-poppins">
-
-
       {origin !== 'admin' ? <Nav /> : null}
       <Routes>
         <Route path="/" exact element={<Home />} />
@@ -46,27 +49,30 @@ function App() {
         <Route path="/kayit" element={<Register />} />
         <Route path="/sepet" element={<Basket />} />
         <Route path="/kategori/*" element={<Products />} />
+        <Route path="/odeme" element={<Pay />} />
         <Route path="/urunler/:category/:name/:id" element={<ProductDetails />} />
         <Route path="*" element={<MainNotFound />} />
 
+        <Route path="/hesabim" element={<AppAccount />}>
+          <Route index element={<UserOrders />} />
+          <Route path="siparisler" element={<UserOrders />} />
+          <Route path="profil" element={<UserProfile />} />
+        </Route>
+
         <Route path="/admin" element={<AppAdmin />}>
           <Route index element={<Dashboard />} />
-          <Route path="/admin/kategoriler" element={<Categories />} />
-          <Route path='/admin/kategori-ozellik' element={<CatFeature />} />
-          <Route path="/admin/markalar" element={<Brand />} />
-          <Route path="/admin/siparisler" element={<Orders />} />
-          <Route path="/admin/urunler" element={<AProducts />} />
-          <Route path="/admin/urunler/:id" element={<ProductEdit />} />
-          <Route path="/admin/urun-ekle" element={<ProductAdd />} />
+          <Route path="kategoriler" element={<Categories />} />
+          <Route path='kategori-ozellik' element={<CatFeature />} />
+          <Route path="markalar" element={<Brand />} />
+          <Route path="bekleyen-siparisler" element={<Orders />} />
+          <Route path="tamamlanan-siparisler" element={<OrdersCompleted />} />
+          <Route path="urunler" element={<AProducts />} />
+          <Route path="urunler/:id" element={<ProductEdit />} />
+          <Route path="urun-ekle" element={<ProductAdd />} />
           <Route path="*" element={<NotFound />} />
         </Route>
-        {/* <Route path="/products" element={<ProductListing />} /> */}
-        {/* <Route path="/product/:productId" element={<ProductDetails />} /> */}
       </Routes>
       {origin !== 'admin' ? <Footer /> : null}
-
-
-
     </div>
   );
 }

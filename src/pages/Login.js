@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AiFillMail } from 'react-icons/ai';
 import { BsKeyFill } from 'react-icons/bs';
 import usePasswordToggle from './../hooks/usePasswordToggle';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { User,GetCart } from '../stores/user';
 
 

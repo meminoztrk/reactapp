@@ -190,8 +190,6 @@ function Register() {
         else {
             setValidMessage("Eksik veya hatalı bilgi girdiniz!")
         }
-
-
     }
 
     return (

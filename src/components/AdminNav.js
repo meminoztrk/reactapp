@@ -35,8 +35,8 @@ const AdminNav = () => {
     const items = [
         getItem(<Link to="/admin">Gösterge Paneli</Link>, 'admin', <PieChartOutlined />),
         getItem('Siparişler', 'siparisler', <AlertOutlined />,[
-            getItem(<Link to="/admin/bekleyen-siparisler">Bekleyen</Link>,'bekleyen'),
-            getItem(<Link to="/admin/tamamlanan-siparisler">Tamamlanan</Link>,'tamamlanan')
+            getItem(<Link to="/admin/bekleyen-siparisler">Bekleyen</Link>,'bekleyen-siparisler'),
+            getItem(<Link to="/admin/tamamlanan-siparisler">Tamamlanan</Link>,'tamamlanan-siparisler')
         ]), 
         getItem('Kategori', 'kategori', <BuildOutlined />, [
             getItem(<Link to="/admin/kategoriler">Kategoriler</Link>, 'kategoriler'),
