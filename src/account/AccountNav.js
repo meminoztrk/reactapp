@@ -26,6 +26,7 @@ const AccountNav = () => {
 
   const items = [
     getItem(<Link to="/hesabim/siparisler">Siparişlerim</Link>, 'siparisler', <ShoppingCartOutlined />),
+    getItem(<Link to="/hesabim/tamamlanan-siparisler">Tamamlanan Siparişlerim</Link>, 'tamamlanan-siparisler', <ShoppingCartOutlined />),
     getItem(<Link to="/hesabim/profil">Profilim</Link>, 'profil', <UserOutlined />),
     getItem(<Link to="/">Çıkış Yap</Link>, 'markalar', <LogoutOutlined />)
   ];

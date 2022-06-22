@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux';
 import { getMainCategory, setMenuVisibility } from '../stores/category';
 import NavSubCategories from '../containers/NavSubCategories';
@@ -16,6 +16,7 @@ const Nav = (props) => {
     const user = useSelector(state => state.user.user);
     const cart = useSelector(state => state.user.cart);
     const [menu, setMenu] = useState(<></>);
+    let navigate = useNavigate();
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -73,6 +74,7 @@ const Nav = (props) => {
             sessionStorage.removeItem("userCart");
             dispatch(clearCart())
             dispatch(User())
+            navigate("/")
         });
     }
 

@@ -27,6 +27,7 @@ import UserOrders from './account/UserOrders';
 import { UserProfile } from './account/UserProfile';
 import { Pay } from './pages/Pay';
 import OrdersCompleted from './admin/OrdersCompleted';
+import UserCompOrders from './account/UserCompOrders';
 
 
 
@@ -56,6 +57,7 @@ function App() {
         <Route path="/hesabim" element={<AppAccount />}>
           <Route index element={<UserOrders />} />
           <Route path="siparisler" element={<UserOrders />} />
+          <Route path="tamamlanan-siparisler" element={<UserCompOrders />} />
           <Route path="profil" element={<UserProfile />} />
         </Route>
 

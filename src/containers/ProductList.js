@@ -107,8 +107,8 @@ const ProductList = (props) => {
 
                     <div className='flex mt-[7rem] absolute p-2 flex-col space-y-2 group-hover:hidden'>
                         <div className='flex items-center'>
-                            <Rating size='small' name="half-rating-read" defaultValue={4.5} precision={0.5} readOnly />
-                            <span className='text-xs pl-1 pt-1'><b>{id}</b> (460)</span>
+                            <Rating size='small' name="half-rating-read" defaultValue={5} precision={0.5} readOnly />
+                            <span className='text-xs pl-1 pt-1'><b>0</b> (460)</span>
                         </div>
                         <div className='flex'>
                             <span className='block bg-red-700 py-1 px-2 text-xs rounded-lg text-white'>Süper Fiyat</span>
