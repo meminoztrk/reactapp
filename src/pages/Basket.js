@@ -17,7 +17,9 @@ const Basket = () => {
       method: 'DELETE',
       headers: {
         'ApiKey': process.env.REACT_APP_API_KEY,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': "http://2.56.154.39:1040",
+        'Access-Control-Allow-Credentials': 'true'
       },
       credentials: 'include',
     }).then(response => {

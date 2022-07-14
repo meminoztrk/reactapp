@@ -165,7 +165,7 @@ const ProductEdit = () => {
       const symbols = [];
       for await (let file of fileList) {
         if (file.status === "done") {
-          const response = await fetch("https://localhost:7168/api/Products/GetImage?path=" + file.name);
+          const response = await fetch(process.env.REACT_APP_API + "/Products/GetImage?path=" + file.name);
           const blob = await response.blob();
           const filel = new File([blob], file.name, { type: blob.type });
           symbols.push(filel);
