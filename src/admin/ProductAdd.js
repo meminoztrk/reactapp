@@ -31,7 +31,6 @@ const getBase64 = (file) =>
     });
 
 const ProductAdd = () => {
-    const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState([])
     const [previewVisible, setPreviewVisible] = useState(false);
     const [previewImage, setPreviewImage] = useState('');

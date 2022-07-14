@@ -21,7 +21,7 @@ const Nav = (props) => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(getMainCategory())
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const removeCart = async (userId, productFeatureId) => {
         await fetch(process.env.REACT_APP_API + '/Products/DeleteCart?userId=' + userId + '&productFeatureId=' + productFeatureId, {
@@ -112,7 +112,7 @@ const Nav = (props) => {
                     <Row key={index} className='text-gray-600 flex items-start pt-2'>
                         <Col span={6} className="justify-center flex pr-2">
                             <div className="border rounded-lg shadow p-1">
-                                <img src={item.image} ></img>
+                                <img alt='cartimage' src={item.image} ></img>
                             </div>
                         </Col>
                         <Col span={18}>
@@ -149,7 +149,7 @@ const Nav = (props) => {
 
     useEffect(() => {
         checkMenu();
-    }, [user, cart, visible, uvisible])
+    }, [user, cart, visible, uvisible]) // eslint-disable-line react-hooks/exhaustive-deps
 
 
 
@@ -235,7 +235,7 @@ const Nav = (props) => {
             return () => {
                 document.removeEventListener("mousedown", handleClickOutside);
             };
-        }, [ref]);
+        }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
     }
 
     return (

@@ -30,7 +30,7 @@ const UserOrders = () => {
 
   useEffect(() => {
     user.id && getOrders()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const dateFormat = (date) => {
     var dt = new Date(date);
