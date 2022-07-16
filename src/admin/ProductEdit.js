@@ -134,7 +134,12 @@ const ProductEdit = () => {
       formData.append(keyPrefix + "Stock", product.productFeature[y].stock);
     }
 
-    await put(process.env.REACT_APP_API + '/Products/EditProduct?id=' + id, formData)
+    await put(process.env.REACT_APP_API + '/Products/EditProduct?id=' + id, formData, {
+      headers: {
+        'ApiKey': process.env.REACT_APP_API_KEY,
+        'Content-Type': 'application/json'
+      }
+    })
       .then(resp => { setLoading(false); openNotificationWithIcon('success') })
       .catch(function (error) {
         console.log(error.toJSON());
@@ -165,7 +170,12 @@ const ProductEdit = () => {
       const symbols = [];
       for await (let file of fileList) {
         if (file.status === "done") {
-          const response = await fetch(process.env.REACT_APP_API + "/Products/GetImage?path=" + file.name);
+          const response = await fetch(process.env.REACT_APP_API + "/Products/GetImage?path=" + file.name, {
+            headers: {
+              'ApiKey': process.env.REACT_APP_API_KEY,
+              'Content-Type': 'application/json'
+            }
+          });
           const blob = await response.blob();
           const filel = new File([blob], file.name, { type: blob.type });
           symbols.push(filel);

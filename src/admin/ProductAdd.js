@@ -113,7 +113,12 @@ const ProductAdd = () => {
             formData.append(keyPrefix + "Stock", product.productFeature[y].stock);
         }
         
-        await post(process.env.REACT_APP_API + '/Products/SaveProduct', formData)
+        await post(process.env.REACT_APP_API + '/Products/SaveProduct', formData, {
+            headers: {
+                'ApiKey': process.env.REACT_APP_API_KEY,
+                'Content-Type': 'application/json'
+              }
+        })
             .then(resp=> navigate("/admin/urunler"))
             .catch(function (error) {
                 console.log(error.toJSON());
